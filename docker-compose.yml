@@ -1,0 +1,56 @@
+version: '3.9'
+
+services:
+  postgres-db2:
+    container_name: postgres2
+    image: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=auth_commers_service
+    ports:
+      - "5434:5432"
+    volumes:
+      - db:/data/postgres2
+    networks:
+      - test
+
+
+  migrate:
+    image: migrate/migrate
+    networks:
+      - test
+    volumes:
+      - ./migrations:/migrations
+    command: ["-path", "/migrations", "-database" ,"postgres://postgres:3333@postgres2:5432/auth_flash_sale_service?sslmode=disable","up"]
+    depends_on:
+      - postgres-db2
+
+  auth-service:
+    container_name: auth
+    build: .
+    ports:
+      - "8085:8085"
+      - "50051:50051"
+    networks:
+     - test
+
+  redis:
+    image: redis:latest
+    container_name: rediss
+    ports:
+      - "6380:6380"
+    environment:
+      REDIS_PASSWORD: "root"
+    networks:
+      - test
+
+
+networks:
+  test:
+    external: true
+    name: test_gateway
+
+volumes:
+  db:
+  
