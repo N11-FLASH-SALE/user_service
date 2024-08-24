@@ -42,6 +42,9 @@ func (p *postgresStorage) Close() {
 func (p *postgresStorage) User() storage.IUserStorage {
 	return NewUserRepository(p.db)
 }
+func (p *postgresStorage) Card() storage.CardStorage{
+	return NewCardRepository(p.db)
+}
 
 func (p *postgresStorage) Notifications() storage.INotificationStorage {
 	return NewNotificationsRepository(p.db)
