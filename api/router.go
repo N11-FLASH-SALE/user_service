@@ -36,6 +36,7 @@ func Router(hand *handler.Handler) *gin.Engine {
 		user.GET("/profile", hand.GetUserProfile)
 		user.PUT("/profile", hand.UpdateUserProfile)
 		user.POST("/change-password", hand.ChangePassword)
+		user.POST("/photo", hand.UploadMediaUser)
 
 	}
 	return router

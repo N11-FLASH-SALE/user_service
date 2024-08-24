@@ -6,6 +6,7 @@ import (
 	pb "auth/genproto/user"
 	"auth/storage/redis"
 	"net/http"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 )
@@ -319,4 +320,48 @@ func (h Handler) ChangePassword(c *gin.Context) {
 	}
 	h.Log.Info("Password changed successfully finished")
 	c.JSON(200, gin.H{"message": "Password changed successfully"})
+}
+
+// @Summary UploadMediaUser
+// @Security ApiKeyAuth
+// @Description Api for upload a new photo
+// @Tags user
+// @Accept multipart/form-data
+// @Param file formData file true "createUserModel"
+// @Success 200 {object} string
+// @Failure 400 {object} string
+// @Failure 500 {object} string
+// @Router /user/photo [post]
+func (h *Handler) UploadMediaUser(c *gin.Context) {
+	h.Log.Info("UploadMediaUser started")
+	header, _ := c.FormFile("file")
+
+	url := filepath.Join("media/users", header.Filename)
+
+	err := c.SaveUploadedFile(header, url)
+	if err != nil {
+		return
+	}
+
+	var req pb.LoginRes
+	req.Accestoken = c.GetHeader("Authorization")
+	err = auth.GetUserIdFromAccesToken(&req)
+	if err != nil {
+		h.Log.Error(err.Error())
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	reqmain := pb.UpdateUserRequest{Id: req.Id, Photo: url}
+	_, err = h.User.UpdateUser(c, &reqmain)
+	if err != nil {
+		h.Log.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error updating user"})
+		return
+	}
+	h.Log.Info("UploadMediaUser finished successfully")
+	c.JSON(200, gin.H{
+		"message": url,
+	})
+
 }
