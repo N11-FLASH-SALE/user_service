@@ -11,6 +11,7 @@ import (
 type Config struct {
 	Postgres PostgresConfig
 	Server   ServerConfig
+	Token    TokensConfig
 }
 
 type PostgresConfig struct {
@@ -50,7 +51,12 @@ func Load() *Config {
 			PDB_PASSWORD: cast.ToString(coalesce("PDB_PASSWORD", "1234")),
 		},
 		Server: ServerConfig{
-			USER_SERVICE: cast.ToString(coalesce("USER_SERVICE", ":50051")),
+			USER_SERVICE: cast.ToString(coalesce("USER_SERVICE", ":1234")),
+			USER_ROUTER:  cast.ToString(coalesce("USER_ROUTER", ":1234")),
+		},
+		Token: TokensConfig{
+			ACCES_KEY:   cast.ToString(coalesce("ACCES_KEY", "access_key")),
+			REFRESH_KEY: cast.ToString(coalesce("REFRESH_KEY", "refresh_key")),
 		},
 	}
 }
