@@ -22,7 +22,7 @@ func NewPostgresStorage(db *sql.DB) storage.IStorage {
 func ConnectionDb() (*sql.DB, error) {
 	conf := config.Load()
 	conDb := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
-		conf.DB_HOST, conf.DB_PORT, conf.DB_USER, conf.DB_NAME, conf.DB_PASSWORD)
+		conf.Postgres.PDB_HOST, conf.Postgres.PDB_PORT, conf.Postgres.PDB_USER, conf.Postgres.PDB_NAME, conf.Postgres.PDB_PASSWORD)
 	db, err := sql.Open("postgres", conDb)
 	if err != nil {
 		return nil, err
