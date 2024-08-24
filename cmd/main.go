@@ -38,6 +38,13 @@ func main() {
 	server := grpc.NewServer()
 	pb.RegisterUserServer(server, service1)
 	pb.RegisterNotificationsServer(server, service2)
+	log.Printf("Server listening at %v", listener.Addr())
+	go func() {
+		err := server.Serve(listener)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 
 	log.Printf("Server listening at %v", listener.Addr())
 
