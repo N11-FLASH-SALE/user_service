@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"auth/config"
 	"context"
 	"fmt"
 	"time"
@@ -10,9 +11,10 @@ import (
 )
 
 func ConnectDB() *redis.Client {
+	conf := config.Load()
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "redisemail:6379",
-		Password: "root",
+		Addr:     conf.Redis.RDB_ADDRESS,
+		Password: conf.Redis.RDB_PASSWORD,
 		DB:       0,
 	})
 

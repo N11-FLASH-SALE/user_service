@@ -12,6 +12,7 @@ type Config struct {
 	Postgres PostgresConfig
 	Server   ServerConfig
 	Token    TokensConfig
+	Redis    RedisConfig
 }
 
 type PostgresConfig struct {
@@ -57,6 +58,10 @@ func Load() *Config {
 		Token: TokensConfig{
 			ACCES_KEY:   cast.ToString(coalesce("ACCES_KEY", "access_key")),
 			REFRESH_KEY: cast.ToString(coalesce("REFRESH_KEY", "refresh_key")),
+		},
+		Redis: RedisConfig{
+			RDB_ADDRESS:  cast.ToString(coalesce("RDB_ADDRESS", "localhost:6379")),
+			RDB_PASSWORD: cast.ToString(coalesce("RDB_PASSWORD", "")),
 		},
 	}
 }
