@@ -1,0 +1,8 @@
+time=2024-08-24T15:30:25.051+05:00 level=INFO msg="Register is starting"
+time=2024-08-24T15:30:25.052+05:00 level=ERROR msg="Invalid email"
+time=2024-08-24T15:32:57.815+05:00 level=INFO msg="Register is starting"
+time=2024-08-24T15:33:17.837+05:00 level=ERROR msg="rpc error: code = Unavailable desc = connection error: desc = \"transport: Error while dialing: dial tcp [::1]:50051: connect: connection refused\""
+time=2024-08-24T15:36:09.187+05:00 level=INFO msg="Register is starting"
+time=2024-08-24T15:36:29.201+05:00 level=ERROR msg="rpc error: code = Unavailable desc = connection error: desc = \"transport: Error while dialing: dial tcp [::1]:50051: connect: connection refused\""
+time=2024-08-24T15:36:54.472+05:00 level=INFO msg="Register is starting"
+time=2024-08-24T15:37:14.502+05:00 level=ERROR msg="rpc error: code = Unavailable desc = connection error: desc = \"error reading server preface: read tcp [::1]:62541->[::1]:50051: use of closed network connection\""
