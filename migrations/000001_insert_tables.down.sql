@@ -1,3 +1,3 @@
+DROP TABLE IF EXISTS notifications;
 DROP TABLE IF EXISTS users;
 DROP TYPE IF EXISTS roles;
-DROP TABLE IF EXISTS notifications;

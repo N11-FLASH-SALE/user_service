@@ -20,12 +20,15 @@ CREATE TABLE IF NOT EXISTS cards (
     user_id UUID NOT NULL REFERENCES users(id),
     card_number VARCHAR(16) NOT NULL,
     expiration_date DATE NOT NULL,
-    security_code VARCHAR(4) NOT NULL,
-)
+    security_code_hash VARCHAR(4) NOT NULL,
+    amount DOUBLE PRECISION NOT NULL DEFAULT 100000,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
 
 CREATE TABLE IF NOT EXISTS notifications(
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id),
     messages TEXT NOT NULL,
-    is_read BOOLEAN DEFAULT FALSE
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );

@@ -2,27 +2,23 @@ package postgres
 
 import (
 	pb "auth/genproto/user"
-	"auth/pkg/logger"
 	"auth/storage"
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
-	"log/slog"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 type UserRepository struct {
-	Db  *sql.DB
-	Log *slog.Logger
+	Db *sql.DB
 }
 
 func NewUserRepository(db *sql.DB) storage.IUserStorage {
-	return &UserRepository{Db: db, Log: logger.NewLogger()}
+	return &UserRepository{Db: db}
 }
 
-func (u *UserRepository) CreateUser(ctx context.Context, req *pb.RegisterReq) (*pb.RegisterRes, error) {
+func (u UserRepository) CreateUser(ctx context.Context, req *pb.RegisterReq) (*pb.RegisterRes, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, fmt.Errorf("failed to hash password: %w", err)
@@ -34,20 +30,12 @@ func (u *UserRepository) CreateUser(ctx context.Context, req *pb.RegisterReq) (*
 	}
 
 	var userID string
-	userQuery := `INSERT INTO users (fullname, username, email, password_hash, phone, role) 
-                  VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
-	err = tx.QueryRowContext(ctx, userQuery, req.Fullname, req.Username, req.Email, string(hashedPassword), req.Phone, req.Role).Scan(&userID)
+	userQuery := `INSERT INTO users (email, password_hash,first_name,last_name ,date_of_birth,gender ,role) 
+                  VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`
+	err = tx.QueryRowContext(ctx, userQuery, req.Email, string(hashedPassword), req.FirstName, req.LastName, req.DateOfBirth, req.Gender, req.Role).Scan(&userID)
 	if err != nil {
 		tx.Rollback()
 		return nil, fmt.Errorf("failed to insert user: %w", err)
-	}
-
-	locationQuery := `INSERT INTO user_locations (user_id, address, city, country) 
-                      VALUES ($1, $2, $3, $4)`
-	_, err = tx.ExecContext(ctx, locationQuery, userID, req.Address, req.City, req.Country)
-	if err != nil {
-		tx.Rollback()
-		return nil, fmt.Errorf("failed to insert user location: %w", err)
 	}
 
 	err = tx.Commit()
@@ -60,23 +48,15 @@ func (u *UserRepository) CreateUser(ctx context.Context, req *pb.RegisterReq) (*
 	}, nil
 }
 
-func (u *UserRepository) Login(ctx context.Context, req *pb.LoginReq) (*pb.LoginRes, error) {
-	query := `SELECT id, username, password_hash, role FROM users WHERE email = $1`
+func (u UserRepository) Login(ctx context.Context, req *pb.LoginReq) (*pb.LoginRes, error) {
+	query := `SELECT id, password_hash , role FROM users WHERE email = $1 and deleted_at=0`
 
-	var id, username, passwordHash, role string
+	var id, passwordHash, role string
 
-	err := u.Db.QueryRowContext(ctx, query, req.Email).Scan(&id, &username, &passwordHash, &role)
+	err := u.Db.QueryRowContext(ctx, query, req.Email).Scan(&id, &passwordHash, &role)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			query = `SELECT id, username, password_hash, role FROM users WHERE username = $1`
-			err = u.Db.QueryRowContext(ctx, query, req.Email).Scan(&id, &username, &passwordHash, &role)
-			if err != nil {
-				if err == sql.ErrNoRows {
-					return nil, errors.New("user not found")
-				}
-				return nil, err
-			}
-
+			return nil, fmt.Errorf("no such user")
 		} else {
 			return nil, err
 		}
@@ -84,41 +64,25 @@ func (u *UserRepository) Login(ctx context.Context, req *pb.LoginReq) (*pb.Login
 	err = bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(req.Password))
 	if err != nil {
 		if err == bcrypt.ErrMismatchedHashAndPassword {
-			return nil, errors.New("password is incorrect")
+			return nil, fmt.Errorf("password is incorrect")
 		}
 		return nil, err
 	}
 
 	return &pb.LoginRes{
-		Id:       id,
-		Username: username,
-		Role:     role,
+		Id:   id,
+		Role: role,
 	}, nil
-
 }
 
-func (u *UserRepository) GetUserByEmail(ctx context.Context, req *pb.GetUSerByEmailReq) (*pb.FilterUsers, error) {
-	query := `
-        SELECT 
-            u.id, u.fullname, u.username, u.email, u.phone, u.image, u.role, 
-            ul.city, ul.country, ul.address, u.created_at, u.updated_at
-        FROM users u
-        LEFT JOIN user_locations ul ON u.id = ul.user_id
-        WHERE u.email = $1`
+func (u *UserRepository) GetUserByEmail(ctx context.Context, req *pb.GetUSerByEmailReq) (*pb.GetUserResponse, error) {
+	query := `SELECT id, first_name, last_name, date_of_birth, gender, role, created_at FROM users WHERE email = $1 AND deleted_at=0`
 
-	var user pb.FilterUsers
-	var image sql.NullString
-
-	err := u.Db.QueryRowContext(ctx, query, req.Email).Scan(
-		&user.Id, &user.Fullname, &user.Username, &user.Email, &user.PhoneNumber,
-		&image, &user.Role, &user.City, &user.Country, &user.Address,
-		&user.CreatedAt, &user.UpdatedAt,
-	)
-	if !image.Valid {
-		user.ImageUrl = ""
-	} else {
-		user.ImageUrl = image.String
+	user := pb.GetUserResponse{
+		Email: req.Email,
 	}
+
+	err := u.Db.QueryRowContext(ctx, query, req.Email).Scan(&user.Id, &user.FirstName, &user.LastName, &user.DateOfBirth, &user.Gender, &user.Role, &user.CreatedAt)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -128,6 +92,91 @@ func (u *UserRepository) GetUserByEmail(ctx context.Context, req *pb.GetUSerByEm
 	}
 
 	return &user, nil
+}
+
+func (u *UserRepository) GetUserById(ctx context.Context, req *pb.UserId) (*pb.GetUserResponse, error) {
+	query := `SELECT email, first_name, last_name, date_of_birth, gender, role, created_at FROM users WHERE id = $1 AND deleted_at=0`
+
+	user := pb.GetUserResponse{
+		Id: req.Id,
+	}
+
+	err := u.Db.QueryRowContext(ctx, query, req.Id).Scan(&user.Email, &user.FirstName, &user.LastName, &user.DateOfBirth, &user.Gender, &user.Role, &user.CreatedAt)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("user not found")
+		}
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func (u *UserRepository) UpdatePassword(ctx context.Context, req *pb.UpdatePasswordReq) error {
+	query := `update users set password_hash=$1 where id=$2 and deleted_at=0`
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return fmt.Errorf("failed to hash password: %w", err)
+	}
+	result, err := u.Db.ExecContext(ctx, query, hashedPassword, req.Id)
+
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to check rows affected: %w", err)
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("user not found")
+	}
+
+	return nil
+}
+
+func (u *UserRepository) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) error {
+	query := `update users set `
+	n := 1
+	var arr []interface{}
+	if len(req.FirstName) > 0 {
+		query += fmt.Sprintf("first_name=$%d, ", n)
+		arr = append(arr, req.FirstName)
+		n++
+	}
+	if len(req.LastName) > 0 {
+		query += fmt.Sprintf("last_name=$%d, ", n)
+		arr = append(arr, req.LastName)
+		n++
+	}
+	if len(req.DateOfBirth) > 0 {
+		query += fmt.Sprintf("date_of_birth=$%d, ", n)
+		arr = append(arr, req.DateOfBirth)
+		n++
+	}
+	if len(req.Gender) > 0 {
+		query += fmt.Sprintf("gender=$%d, ", n)
+		arr = append(arr, req.Gender)
+		n++
+	}
+	arr = append(arr, req.Id)
+	query += fmt.Sprintf("updated_at=current_timestamp where id=$%d and deleted_at=0", n)
+	result, err := u.Db.Exec(query, arr...)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to check rows affected: %w", err)
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("user not found")
+	}
+
+	return nil
 }
 
 func (u *UserRepository) DeleteUser(ctx context.Context, req *pb.UserId) error {
@@ -151,226 +200,57 @@ func (u *UserRepository) DeleteUser(ctx context.Context, req *pb.UserId) error {
 	return nil
 }
 
-func (u *UserRepository) GetUserById(ctx context.Context, req *pb.UserId) (*pb.GetUserResponse, error) {
-	query := `SELECT id, fullname, username, email, phone, image, role, city, country, address, created_at, updated_at 
-              FROM users 
-              LEFT JOIN user_locations ON users.id = user_locations.user_id 
-              WHERE users.id = $1`
-
-	var user pb.FilterUsers
-	var image sql.NullString
-
-	err := u.Db.QueryRowContext(ctx, query, req.Id).Scan(
-		&user.Id,
-		&user.Fullname,
-		&user.Username,
-		&user.Email,
-		&user.PhoneNumber,
-		&image,
-		&user.Role,
-		&user.City,
-		&user.Country,
-		&user.Address,
-		&user.CreatedAt,
-		&user.UpdatedAt,
-	)
-	if !image.Valid {
-		user.ImageUrl = ""
-	} else {
-		user.ImageUrl = image.String
-	}
+func (u *UserRepository) ResetPassword(ctx context.Context, req *pb.ResetPasswordReq) error {
+	query := `SELECT password_hash FROM users WHERE id = $1 AND deleted_at=0`
+	var passwordHash string
+	err := u.Db.QueryRowContext(ctx, query, req.Id).Scan(&passwordHash)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("user not found")
+			return fmt.Errorf("user not found")
 		}
-		return nil, fmt.Errorf("failed to fetch user: %w", err)
-	}
-
-	// Prepare the response
-	response := &pb.GetUserResponse{
-		User: &user,
-	}
-
-	return response, nil
-}
-
-func (u *UserRepository) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) error {
-	query := `update users set `
-	n := 1
-	var arr []interface{}
-	if len(req.Fullname) > 0 {
-		query += fmt.Sprintf("fullname=$%d, ", n)
-		arr = append(arr, req.Fullname)
-		n++
-	}
-	if len(req.Username) > 0 {
-		query += fmt.Sprintf("username=$%d, ", n)
-		arr = append(arr, req.Username)
-		n++
-	}
-	if len(req.PhoneNumber) > 0 {
-		query += fmt.Sprintf("phone=$%d, ", n)
-		arr = append(arr, req.PhoneNumber)
-		n++
-	}
-	if len(req.ImageUrl) > 0 {
-		query += fmt.Sprintf("image=$%d, ", n)
-		arr = append(arr, req.ImageUrl)
-		n++
-	}
-	arr = append(arr, req.Id)
-	query += fmt.Sprintf("updated_at=current_timestamp where id=$%d and deleted_at=0", n)
-	_, err := u.Db.Exec(query, arr...)
-	if err != nil {
 		return err
 	}
-
-	query = `update user_locations set `
-	n = 1
-	var arr1 []interface{}
-	if len(req.City) > 0 {
-		query += fmt.Sprintf("city=$%d, ", n)
-		arr1 = append(arr1, req.City)
-		n++
-	}
-	if len(req.Country) > 0 {
-		query += fmt.Sprintf("country=$%d, ", n)
-		arr1 = append(arr1, req.Country)
-		n++
-	}
-	if len(req.Address) > 0 {
-		query += fmt.Sprintf("address=$%d, ", n)
-		arr1 = append(arr1, req.Address)
-		n++
-	}
-	if len(req.PostalCode) > 0 {
-		query += fmt.Sprintf("postal_code=$%d, ", n)
-		arr1 = append(arr1, req.PostalCode)
-		n++
-	}
-
-	if len(arr1) == 0 {
-		return nil
-	} else {
-		arr1 = append(arr1, req.Id)
-		query = query[:len(query)-2]
-		query += fmt.Sprintf(" where user_id=$%d", n)
-		_, err = u.Db.Exec(query, arr1...)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (u *UserRepository) GetUsers(ctx context.Context, req *pb.UsersListRequest) (*pb.UsersResponse, error) {
-	query := `SELECT id, fullname, username, email, phone, image, role, city, country, address, created_at, updated_at 
-	FROM users 
-	LEFT JOIN user_locations ON users.id = user_locations.user_id
-	where `
-	n := 1
-	var arr []interface{}
-	if len(req.Users.Id) > 0 {
-		query += fmt.Sprintf("id=$%d and ", n)
-		arr = append(arr, req.Users.Id)
-		n++
-	}
-	if len(req.Users.Fullname) > 0 {
-		query += fmt.Sprintf("fullname=$%d and ", n)
-		arr = append(arr, req.Users.Fullname)
-		n++
-	}
-	if len(req.Users.Username) > 0 {
-		query += fmt.Sprintf("username=$%d and ", n)
-		arr = append(arr, req.Users.Username)
-		n++
-	}
-	if len(req.Users.Email) > 0 {
-		query += fmt.Sprintf("email=$%d and ", n)
-		arr = append(arr, req.Users.Email)
-		n++
-	}
-	if len(req.Users.PhoneNumber) > 0 {
-		query += fmt.Sprintf("phone=$%d and ", n)
-		arr = append(arr, req.Users.PhoneNumber)
-		n++
-	}
-	if len(req.Users.Role) > 0 {
-		query += fmt.Sprintf("role=$%d and ", n)
-		arr = append(arr, req.Users.Role)
-		n++
-	}
-	if len(req.Users.City) > 0 {
-		query += fmt.Sprintf("city=$%d and ", n)
-		arr = append(arr, req.Users.City)
-		n++
-	}
-	if len(req.Users.Country) > 0 {
-		query += fmt.Sprintf("country=$%d and ", n)
-		arr = append(arr, req.Users.Country)
-		n++
-	}
-	if len(req.Users.Address) > 0 {
-		query += fmt.Sprintf("address=$%d and ", n)
-		arr = append(arr, req.Users.Address)
-		n++
-	}
-	query += "deleted_at=0 "
-	query += fmt.Sprintf("Limit %d ", req.Limit)
-
-	if req.Offset > 0 {
-		query += fmt.Sprintf("OFFSET %d ", req.Offset)
-	}
-
-	rows, err := u.Db.Query(query, arr...)
-	fmt.Print("\n\n", query, "\n")
+	err = bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(req.Oldpassword))
 	if err != nil {
-		return nil, err
-	}
-
-	defer rows.Close()
-
-	res := pb.UsersResponse{}
-	for rows.Next() {
-		us := pb.FilterUsers{}
-		var image sql.NullString
-		err = rows.Scan(&us.Id, &us.Fullname, &us.Username, &us.Email, &us.PhoneNumber, &image, &us.Role, &us.City, &us.Country, &us.Address, &us.CreatedAt, &us.UpdatedAt)
-		if !image.Valid {
-			us.ImageUrl = ""
-		} else {
-			us.ImageUrl = image.String
+		if err == bcrypt.ErrMismatchedHashAndPassword {
+			return fmt.Errorf("password is incorrect")
 		}
-		if err != nil {
-			return nil, err
-		}
-		res.Users = append(res.Users, &us)
+		return err
 	}
-	res.Offset = req.Offset
-	res.Limit = req.Limit
-	return &res, nil
-}
-
-func (u *UserRepository) UpdatePassword(ctx context.Context, req *pb.UpdatePasswordReq) error {
-	fmt.Println(req)
-	query := `update users set password_hash=$1 where id=$2 and deleted_at=0`
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Newpassword), bcrypt.DefaultCost)
 	if err != nil {
 		return fmt.Errorf("failed to hash password: %w", err)
 	}
+	query = `UPDATE users SET password_hash=$1 WHERE id=$2 AND deleted_at=0`
 	result, err := u.Db.ExecContext(ctx, query, hashedPassword, req.Id)
-
 	if err != nil {
 		return err
 	}
-
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
 		return fmt.Errorf("failed to check rows affected: %w", err)
 	}
-
 	if rowsAffected == 0 {
 		return fmt.Errorf("user not found")
+	}
+	return nil
+}
+
+func (u *UserRepository) IsUserExist(ctx context.Context, req *pb.UserId) error {
+	var exists bool
+	err := u.Db.QueryRowContext(ctx, `
+		SELECT EXISTS (
+			SELECT 1
+			FROM users
+			WHERE id = $1
+		)
+	`, req.GetId()).Scan(&exists)
+	if err != nil {
+		return fmt.Errorf("failed to check if user exists: %w", err)
+	}
+
+	if !exists {
+		return fmt.Errorf("user with id %s does not exist", req.GetId())
 	}
 
 	return nil

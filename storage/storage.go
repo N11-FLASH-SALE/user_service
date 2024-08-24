@@ -7,16 +7,24 @@ import (
 
 type IStorage interface {
 	User() IUserStorage
+	Notifications() INotificationStorage
 	Close()
 }
 
 type IUserStorage interface {
 	CreateUser(context.Context, *pb.RegisterReq) (*pb.RegisterRes, error)
 	Login(context.Context, *pb.LoginReq) (*pb.LoginRes, error)
-	GetUserByEmail(context.Context, *pb.GetUSerByEmailReq) (*pb.FilterUsers, error)
-	DeleteUser(context.Context, *pb.UserId) error
+	GetUserByEmail(context.Context, *pb.GetUSerByEmailReq) (*pb.GetUserResponse, error)
 	GetUserById(context.Context, *pb.UserId) (*pb.GetUserResponse, error)
-	UpdateUser(context.Context, *pb.UpdateUserRequest) error
-	GetUsers(context.Context, *pb.UsersListRequest) (*pb.UsersResponse, error)
 	UpdatePassword(context.Context, *pb.UpdatePasswordReq) error
+	UpdateUser(context.Context, *pb.UpdateUserRequest) error
+	DeleteUser(context.Context, *pb.UserId) error
+	ResetPassword(context.Context, *pb.ResetPasswordReq) error
+	IsUserExist(context.Context, *pb.UserId) error
+}
+
+type INotificationStorage interface {
+	CreateNotifications(context.Context, *pb.CreateNotificationsReq) (*pb.CreateNotificationsRes, error)
+	GetAllNotifications(context.Context, *pb.GetNotificationsReq) (*pb.GetNotificationsResponse, error)
+	GetAndMarkNotificationAsRead(context.Context, *pb.GetAndMarkNotificationAsReadReq) (*pb.GetAndMarkNotificationAsReadRes, error)
 }

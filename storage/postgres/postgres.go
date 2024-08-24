@@ -5,27 +5,24 @@ import (
 	"auth/storage"
 	"database/sql"
 	"fmt"
-	"log/slog"
 
 	_ "github.com/lib/pq"
 )
 
 type postgresStorage struct {
-	db  *sql.DB
-	log *slog.Logger
+	db *sql.DB
 }
 
-func NewPostgresStorage(db *sql.DB, log *slog.Logger) storage.IStorage {
+func NewPostgresStorage(db *sql.DB) storage.IStorage {
 	return &postgresStorage{
-		db:  db,
-		log: log,
+		db: db,
 	}
 }
 
 func ConnectionDb() (*sql.DB, error) {
 	conf := config.Load()
 	conDb := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
-		conf.Postgres.DB_HOST, conf.Postgres.DB_PORT, conf.Postgres.DB_USER, conf.Postgres.DB_NAME, conf.Postgres.DB_PASSWORD)
+		conf.DB_HOST, conf.DB_PORT, conf.DB_USER, conf.DB_NAME, conf.DB_PASSWORD)
 	db, err := sql.Open("postgres", conDb)
 	if err != nil {
 		return nil, err
@@ -44,4 +41,8 @@ func (p *postgresStorage) Close() {
 
 func (p *postgresStorage) User() storage.IUserStorage {
 	return NewUserRepository(p.db)
+}
+
+func (p *postgresStorage) Notifications() storage.INotificationStorage {
+	return NewNotificationsRepository(p.db)
 }
