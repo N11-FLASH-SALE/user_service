@@ -8,6 +8,7 @@ import (
 type IStorage interface {
 	User() IUserStorage
 	Notifications() INotificationStorage
+	Card() CardStorage
 	Close()
 }
 

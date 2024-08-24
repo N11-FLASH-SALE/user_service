@@ -12,6 +12,7 @@ type Config struct {
 	Postgres PostgresConfig
 	Server   ServerConfig
 	Token    TokensConfig
+	Redis    RedisConfig
 }
 
 type PostgresConfig struct {
@@ -47,8 +48,8 @@ func Load() *Config {
 			PDB_HOST:     cast.ToString(coalesce("PDB_HOST", "localhost")),
 			PDB_PORT:     cast.ToString(coalesce("PDB_PORT", "5432")),
 			PDB_USER:     cast.ToString(coalesce("PDB_USER", "postgres")),
-			PDB_NAME:     cast.ToString(coalesce("PDB_NAME", "any")),
-			PDB_PASSWORD: cast.ToString(coalesce("PDB_PASSWORD", "1234")),
+			PDB_NAME:     cast.ToString(coalesce("PDB_NAME", "postgres")),
+			PDB_PASSWORD: cast.ToString(coalesce("PDB_PASSWORD", "3333")),
 		},
 		Server: ServerConfig{
 			USER_SERVICE: cast.ToString(coalesce("USER_SERVICE", ":1234")),
@@ -57,6 +58,10 @@ func Load() *Config {
 		Token: TokensConfig{
 			ACCES_KEY:   cast.ToString(coalesce("ACCES_KEY", "access_key")),
 			REFRESH_KEY: cast.ToString(coalesce("REFRESH_KEY", "refresh_key")),
+		},
+		Redis: RedisConfig{
+			RDB_ADDRESS:  cast.ToString(coalesce("RDB_ADDRESS", "localhost:6379")),
+			RDB_PASSWORD: cast.ToString(coalesce("RDB_PASSWORD", "")),
 		},
 	}
 }

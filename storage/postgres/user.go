@@ -5,6 +5,7 @@ import (
 	"auth/storage"
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
@@ -30,9 +31,9 @@ func (u UserRepository) CreateUser(ctx context.Context, req *pb.RegisterReq) (*p
 	}
 
 	var userID string
-	userQuery := `INSERT INTO users (email, password_hash,first_name,last_name ,date_of_birth,gender ,role) 
-                  VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`
-	err = tx.QueryRowContext(ctx, userQuery, req.Email, string(hashedPassword), req.FirstName, req.LastName, req.DateOfBirth, req.Gender, req.Role).Scan(&userID)
+	userQuery := `INSERT INTO users (email, password_hash, full_name, phone_number, address, role) 
+                  VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
+	err = tx.QueryRowContext(ctx, userQuery, req.Email, string(hashedPassword), req.Fullname, req.Phone, req.Address, req.Role).Scan(&userID)
 	if err != nil {
 		tx.Rollback()
 		return nil, fmt.Errorf("failed to insert user: %w", err)
@@ -52,11 +53,17 @@ func (u UserRepository) Login(ctx context.Context, req *pb.LoginReq) (*pb.LoginR
 	query := `SELECT id, password_hash , role FROM users WHERE email = $1 and deleted_at=0`
 
 	var id, passwordHash, role string
-
 	err := u.Db.QueryRowContext(ctx, query, req.Email).Scan(&id, &passwordHash, &role)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("no such user")
+			query = `SELECT id, password_hash, role FROM users WHERE phone_number = $1`
+			err = u.Db.QueryRowContext(ctx, query, req.Email).Scan(&id, &passwordHash, &role)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					return nil, errors.New("user not found")
+				}
+				return nil, err
+			}
 		} else {
 			return nil, err
 		}
@@ -76,37 +83,52 @@ func (u UserRepository) Login(ctx context.Context, req *pb.LoginReq) (*pb.LoginR
 }
 
 func (u *UserRepository) GetUserByEmail(ctx context.Context, req *pb.GetUSerByEmailReq) (*pb.GetUserResponse, error) {
-	query := `SELECT id, first_name, last_name, date_of_birth, gender, role, created_at FROM users WHERE email = $1 AND deleted_at=0`
+	query := `SELECT id, full_name,  phone_number, address, photo ,role, created_at FROM users WHERE email = $1 AND deleted_at=0`
 
 	user := pb.GetUserResponse{
 		Email: req.Email,
 	}
 
-	err := u.Db.QueryRowContext(ctx, query, req.Email).Scan(&user.Id, &user.FirstName, &user.LastName, &user.DateOfBirth, &user.Gender, &user.Role, &user.CreatedAt)
+	var photo sql.NullString
+
+	err := u.Db.QueryRowContext(ctx, query, req.Email).Scan(&user.Id, &user.Fullname, &user.Phone, &user.Address, &photo, &user.Role, &user.CreatedAt)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, fmt.Errorf("user not found")
 		}
 		return nil, err
+	}
+	if photo.Valid {
+		user.Photo = photo.String
+	} else {
+		user.Photo = ""
 	}
 
 	return &user, nil
 }
 
 func (u *UserRepository) GetUserById(ctx context.Context, req *pb.UserId) (*pb.GetUserResponse, error) {
-	query := `SELECT email, first_name, last_name, date_of_birth, gender, role, created_at FROM users WHERE id = $1 AND deleted_at=0`
+	query := `SELECT email, full_name,  phone_number, address, photo ,role, created_at FROM users WHERE id = $1 AND deleted_at=0`
 
 	user := pb.GetUserResponse{
 		Id: req.Id,
 	}
 
-	err := u.Db.QueryRowContext(ctx, query, req.Id).Scan(&user.Email, &user.FirstName, &user.LastName, &user.DateOfBirth, &user.Gender, &user.Role, &user.CreatedAt)
+	var photo sql.NullString
+
+	err := u.Db.QueryRowContext(ctx, query, req.Id).Scan(&user.Email, &user.Fullname, &user.Phone, &user.Address, &photo, &user.Role, &user.CreatedAt)
+
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, fmt.Errorf("user not found")
 		}
 		return nil, err
+	}
+	if photo.Valid {
+		user.Photo = photo.String
+	} else {
+		user.Photo = ""
 	}
 
 	return &user, nil
@@ -140,24 +162,24 @@ func (u *UserRepository) UpdateUser(ctx context.Context, req *pb.UpdateUserReque
 	query := `update users set `
 	n := 1
 	var arr []interface{}
-	if len(req.FirstName) > 0 {
-		query += fmt.Sprintf("first_name=$%d, ", n)
-		arr = append(arr, req.FirstName)
+	if len(req.Fullname) > 0 {
+		query += fmt.Sprintf("full_name=$%d, ", n)
+		arr = append(arr, req.Fullname)
 		n++
 	}
-	if len(req.LastName) > 0 {
-		query += fmt.Sprintf("last_name=$%d, ", n)
-		arr = append(arr, req.LastName)
+	if len(req.Address) > 0 {
+		query += fmt.Sprintf("address=$%d, ", n)
+		arr = append(arr, req.Address)
 		n++
 	}
-	if len(req.DateOfBirth) > 0 {
-		query += fmt.Sprintf("date_of_birth=$%d, ", n)
-		arr = append(arr, req.DateOfBirth)
+	if len(req.Photo) > 0 {
+		query += fmt.Sprintf("photo=$%d, ", n)
+		arr = append(arr, req.Photo)
 		n++
 	}
-	if len(req.Gender) > 0 {
-		query += fmt.Sprintf("gender=$%d, ", n)
-		arr = append(arr, req.Gender)
+	if len(req.Phone) > 0 {
+		query += fmt.Sprintf("phone_number=$%d, ", n)
+		arr = append(arr, req.Phone)
 		n++
 	}
 	arr = append(arr, req.Id)
