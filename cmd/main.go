@@ -33,11 +33,15 @@ func main() {
 	logger := logs.NewLogger()
 	service1 := service.NewUserService(Db, logger)
 	service2 := service.NewNotificationsService(Db, logger)
+	service3 := service.NewCardsService(Db, logger)
+	
 	defer service1.User.Close()
 
 	server := grpc.NewServer()
 	pb.RegisterUserServer(server, service1)
 	pb.RegisterNotificationsServer(server, service2)
+	pb.RegisterCardsServer(server,service3)
+
 	log.Printf("Server listening at %v", listener.Addr())
 	go func() {
 		err := server.Serve(listener)
