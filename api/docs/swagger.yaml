@@ -260,6 +260,35 @@ paths:
       summary: logout user
       tags:
       - user
+  /user/photo:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Api for upload a new photo
+      parameters:
+      - description: createUserModel
+        in: formData
+        name: file
+        required: true
+        type: file
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: UploadMediaUser
+      tags:
+      - user
   /user/profile:
     get:
       description: Get User Profile by token
