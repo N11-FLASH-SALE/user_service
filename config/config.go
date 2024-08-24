@@ -14,15 +14,26 @@ type Config struct {
 }
 
 type PostgresConfig struct {
-	DB_HOST     string
-	DB_PORT     string
-	DB_USER     string
-	DB_NAME     string
-	DB_PASSWORD string
+	PDB_NAME     string
+	PDB_PORT     string
+	PDB_PASSWORD string
+	PDB_USER     string
+	PDB_HOST     string
+}
+
+type RedisConfig struct {
+	RDB_ADDRESS  string
+	RDB_PASSWORD string
 }
 
 type ServerConfig struct {
-	USER_PORT string
+	USER_SERVICE string
+	USER_ROUTER  string
+}
+
+type TokensConfig struct {
+	ACCES_KEY   string
+	REFRESH_KEY string
 }
 
 func Load() *Config {
@@ -32,14 +43,14 @@ func Load() *Config {
 
 	return &Config{
 		Postgres: PostgresConfig{
-			DB_HOST:     cast.ToString(coalesce("DB_HOST", "localhost")),
-			DB_PORT:     cast.ToString(coalesce("DB_PORT", "5432")),
-			DB_USER:     cast.ToString(coalesce("DB_USER", "postgres")),
-			DB_NAME:     cast.ToString(coalesce("DB_NAME", "any")),
-			DB_PASSWORD: cast.ToString(coalesce("DB_PASSWORD", "3333")),
+			PDB_HOST:     cast.ToString(coalesce("PDB_HOST", "localhost")),
+			PDB_PORT:     cast.ToString(coalesce("PDB_PORT", "5432")),
+			PDB_USER:     cast.ToString(coalesce("PDB_USER", "postgres")),
+			PDB_NAME:     cast.ToString(coalesce("PDB_NAME", "any")),
+			PDB_PASSWORD: cast.ToString(coalesce("PDB_PASSWORD", "1234")),
 		},
 		Server: ServerConfig{
-			USER_PORT: cast.ToString(coalesce("USER_PORT", ":50051")),
+			USER_SERVICE: cast.ToString(coalesce("USER_SERVICE", ":50051")),
 		},
 	}
 }
