@@ -46,8 +46,6 @@ func main() {
 		}
 	}()
 
-	log.Printf("Server listening at %v", listener.Addr())
-
 	hand := NewHandler()
 	router := api.Router(hand)
 	err = router.Run(config.Load().Server.USER_ROUTER)
