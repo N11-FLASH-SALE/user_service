@@ -8,6 +8,7 @@ import (
 type IStorage interface {
 	User() IUserStorage
 	Notifications() INotificationStorage
+	Card() CardStorage
 	Close()
 }
 
@@ -23,6 +24,12 @@ type IUserStorage interface {
 	IsUserExist(context.Context, *pb.UserId) error
 }
 
+type CardStorage interface{
+	CreateCard(context.Context, *pb.CreateCardReq) (*pb.CreateCardRes, error)
+	GetCardsOfUser(context.Context, *pb.GetCardsOfUserReq) (*pb.GetCardsOfUserRes, error)
+	GetCardAmount(context.Context, *pb.GetCardAmountReq) (*pb.GetCardAmountRes, error)
+	UpdateCardAmount(context.Context, *pb.UpdateCardAmountReq) (*pb.UpdateCardAmountRes, error)
+}
 type INotificationStorage interface {
 	CreateNotifications(context.Context, *pb.CreateNotificationsReq) (*pb.CreateNotificationsRes, error)
 	GetAllNotifications(context.Context, *pb.GetNotificationsReq) (*pb.GetNotificationsResponse, error)
