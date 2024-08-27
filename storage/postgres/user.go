@@ -264,7 +264,7 @@ func (u *UserRepository) IsUserExist(ctx context.Context, req *pb.UserId) error 
 		SELECT EXISTS (
 			SELECT 1
 			FROM users
-			WHERE id = $1
+			WHERE id = $1 and deleted_at=0
 		)
 	`, req.GetId()).Scan(&exists)
 	if err != nil {
