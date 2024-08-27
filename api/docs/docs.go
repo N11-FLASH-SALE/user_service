@@ -300,7 +300,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "file",
-                        "description": "createUserModel",
+                        "description": "UploadMediaForm",
                         "name": "file",
                         "in": "formData",
                         "required": true

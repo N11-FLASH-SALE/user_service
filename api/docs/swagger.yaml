@@ -266,7 +266,7 @@ paths:
       - multipart/form-data
       description: Api for upload a new photo
       parameters:
-      - description: createUserModel
+      - description: UploadMediaForm
         in: formData
         name: file
         required: true

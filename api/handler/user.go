@@ -5,10 +5,15 @@ import (
 	"auth/api/email"
 	pb "auth/genproto/user"
 	"auth/storage/redis"
+	"context"
 	"net/http"
 	"path/filepath"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
 // Register godoc
@@ -327,7 +332,7 @@ func (h Handler) ChangePassword(c *gin.Context) {
 // @Description Api for upload a new photo
 // @Tags user
 // @Accept multipart/form-data
-// @Param file formData file true "createUserModel"
+// @Param file formData file true "UploadMediaForm"
 // @Success 200 {object} string
 // @Failure 400 {object} string
 // @Failure 500 {object} string
@@ -342,6 +347,40 @@ func (h *Handler) UploadMediaUser(c *gin.Context) {
 	if err != nil {
 		return
 	}
+
+	// minio start
+
+	fileExt := filepath.Ext(header.Filename)
+
+	println("\n File Ext:", fileExt)
+
+	newFile := uuid.NewString() + fileExt
+	minioClient, err := minio.New("localhost:9000", &minio.Options{
+		Creds:  credentials.NewStaticV4("test", "minioadmin", ""),
+		Secure: false,
+	})
+	if err != nil {
+		c.AbortWithError(500, err)
+		return
+	}
+
+	info, err := minioClient.FPutObject(context.Background(), "photos", newFile, url, minio.PutObjectOptions{
+		ContentType: "image/jpeg",
+	})
+	if err != nil {
+		c.AbortWithError(500, err)
+		return
+	}
+
+	println("\n Info Bucket:", info.Bucket)
+
+	objUrl, err := minioClient.PresignedGetObject(context.Background(), "photos", newFile, time.Hour*24, nil)
+	if err != nil {
+		c.AbortWithError(500, err)
+		return
+	}
+
+	// minio end
 
 	var req pb.LoginRes
 	req.Accestoken = c.GetHeader("Authorization")
@@ -361,7 +400,8 @@ func (h *Handler) UploadMediaUser(c *gin.Context) {
 	}
 	h.Log.Info("UploadMediaUser finished successfully")
 	c.JSON(200, gin.H{
-		"message": url,
+		"url":       url,
+		"minio url": objUrl.String(),
 	})
 
 }
