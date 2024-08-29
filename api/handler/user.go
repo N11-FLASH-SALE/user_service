@@ -6,6 +6,7 @@ import (
 	pb "auth/genproto/user"
 	"auth/storage/redis"
 	"context"
+	"fmt"
 	"net/http"
 	"path/filepath"
 	"time"
@@ -372,6 +373,28 @@ func (h *Handler) UploadMediaUser(c *gin.Context) {
 		return
 	}
 
+	policy := fmt.Sprintf(`{
+		"Version": "2012-10-17",
+		"Statement": [
+			{
+				"Effect": "Allow",
+				"Principal": {
+					"AWS": ["*"]
+				},
+				"Action": ["s3:GetObject"],
+				"Resource": ["arn:aws:s3:::%s/*"]
+			}
+		]
+	}`, "photos")
+
+	err = minioClient.SetBucketPolicy(context.Background(), "photos", policy)
+	if err != nil {
+		c.AbortWithError(500, err)
+		return
+	}
+
+	madeUrl := fmt.Sprintf("http://localhost:9000/photos/%s", newFile)
+
 	println("\n Info Bucket:", info.Bucket)
 
 	objUrl, err := minioClient.PresignedGetObject(context.Background(), "photos", newFile, time.Hour*24, nil)
@@ -402,6 +425,7 @@ func (h *Handler) UploadMediaUser(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"url":       url,
 		"minio url": objUrl.String(),
+		"made_url":  madeUrl,
 	})
 
 }
