@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS cards (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id),
-    card_number VARCHAR(16) NOT NULL,
+    card_number VARCHAR(20) NOT NULL,
     expiration_date DATE NOT NULL,
     security_code_hash VARCHAR(4) NOT NULL,
     amount DOUBLE PRECISION NOT NULL DEFAULT 100000,
