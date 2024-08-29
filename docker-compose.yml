@@ -1,6 +1,52 @@
-version: '3.8'
+version: '3.9'
 
 services:
+
+  redis-db:  
+    image: redis:latest
+    container_name: redisemail
+    ports:
+      - "6379:6379"
+    environment:
+      REDIS_PASSWORD: "root"
+    networks:
+      - sales
+
+  postgres-db:
+    container_name: postgres
+    image: postgres
+    environment:
+      - POSTGRES_USER=${PDB_USER}
+      - POSTGRES_PASSWORD=${PDB_PASSWORD}
+      - POSTGRES_DB=${PDB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db:/data/postgres
+    networks:
+      - sales
+
+    
+  migrate:
+    image: migrate/migrate
+    networks:
+      - sales
+    volumes:
+      - ./migrations:/migrations
+    depends_on:
+      - postgres-db
+    command: ["-path", "/migrations", "-database" ,"postgres://${PDB_USER}:${PDB_PASSWORD}@postgres:${PDB_PORT}/${PDB_NAME}?sslmode=disable","up"]
+
+  userservice:
+    container_name: auth
+    build: .
+    ports:
+      - "8085:8085"
+    networks:
+     - sales
+    depends_on:
+      - postgres-db
+
   minio:
     image: docker.io/bitnami/minio:2024
     ports:
@@ -18,6 +64,13 @@ services:
       timeout: 10s
       retries: 5
 
+networks:
+  sales:
+    external: true
+
+
 volumes:
   minio_data:
     driver: local
+  db:
+   
