@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"net/http"
 	"path/filepath"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -397,12 +396,6 @@ func (h *Handler) UploadMediaUser(c *gin.Context) {
 
 	println("\n Info Bucket:", info.Bucket)
 
-	objUrl, err := minioClient.PresignedGetObject(context.Background(), "photos", newFile, time.Hour*24, nil)
-	if err != nil {
-		c.AbortWithError(500, err)
-		return
-	}
-
 	// minio end
 
 	var req pb.LoginRes
@@ -424,8 +417,7 @@ func (h *Handler) UploadMediaUser(c *gin.Context) {
 	h.Log.Info("UploadMediaUser finished successfully")
 	c.JSON(200, gin.H{
 		"url":       url,
-		"minio url": objUrl.String(),
-		"made_url":  madeUrl,
+		"minio url": madeUrl,
 	})
 
 }
