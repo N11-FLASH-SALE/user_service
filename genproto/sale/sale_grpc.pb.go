@@ -28,6 +28,8 @@ type ProductClient interface {
 	UpdateProduct(ctx context.Context, in *UpdateProductRequest, opts ...grpc.CallOption) (*Void, error)
 	DeleteProduct(ctx context.Context, in *ProductId, opts ...grpc.CallOption) (*Void, error)
 	IsProductOk(ctx context.Context, in *ProductId, opts ...grpc.CallOption) (*Void, error)
+	AddPhotosToProduct(ctx context.Context, in *AddPhotosRequest, opts ...grpc.CallOption) (*Void, error)
+	DeletePhotosFromProduct(ctx context.Context, in *DeletePhotosRequest, opts ...grpc.CallOption) (*Void, error)
 }
 
 type productClient struct {
@@ -92,6 +94,24 @@ func (c *productClient) IsProductOk(ctx context.Context, in *ProductId, opts ...
 	return out, nil
 }
 
+func (c *productClient) AddPhotosToProduct(ctx context.Context, in *AddPhotosRequest, opts ...grpc.CallOption) (*Void, error) {
+	out := new(Void)
+	err := c.cc.Invoke(ctx, "/sale.Product/AddPhotosToProduct", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *productClient) DeletePhotosFromProduct(ctx context.Context, in *DeletePhotosRequest, opts ...grpc.CallOption) (*Void, error) {
+	out := new(Void)
+	err := c.cc.Invoke(ctx, "/sale.Product/DeletePhotosFromProduct", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProductServer is the server API for Product service.
 // All implementations must embed UnimplementedProductServer
 // for forward compatibility
@@ -102,6 +122,8 @@ type ProductServer interface {
 	UpdateProduct(context.Context, *UpdateProductRequest) (*Void, error)
 	DeleteProduct(context.Context, *ProductId) (*Void, error)
 	IsProductOk(context.Context, *ProductId) (*Void, error)
+	AddPhotosToProduct(context.Context, *AddPhotosRequest) (*Void, error)
+	DeletePhotosFromProduct(context.Context, *DeletePhotosRequest) (*Void, error)
 	mustEmbedUnimplementedProductServer()
 }
 
@@ -126,6 +148,12 @@ func (UnimplementedProductServer) DeleteProduct(context.Context, *ProductId) (*V
 }
 func (UnimplementedProductServer) IsProductOk(context.Context, *ProductId) (*Void, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method IsProductOk not implemented")
+}
+func (UnimplementedProductServer) AddPhotosToProduct(context.Context, *AddPhotosRequest) (*Void, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddPhotosToProduct not implemented")
+}
+func (UnimplementedProductServer) DeletePhotosFromProduct(context.Context, *DeletePhotosRequest) (*Void, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeletePhotosFromProduct not implemented")
 }
 func (UnimplementedProductServer) mustEmbedUnimplementedProductServer() {}
 
@@ -248,6 +276,42 @@ func _Product_IsProductOk_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Product_AddPhotosToProduct_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddPhotosRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductServer).AddPhotosToProduct(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sale.Product/AddPhotosToProduct",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductServer).AddPhotosToProduct(ctx, req.(*AddPhotosRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Product_DeletePhotosFromProduct_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeletePhotosRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductServer).DeletePhotosFromProduct(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sale.Product/DeletePhotosFromProduct",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductServer).DeletePhotosFromProduct(ctx, req.(*DeletePhotosRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Product_ServiceDesc is the grpc.ServiceDesc for Product service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -279,6 +343,14 @@ var Product_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "IsProductOk",
 			Handler:    _Product_IsProductOk_Handler,
 		},
+		{
+			MethodName: "AddPhotosToProduct",
+			Handler:    _Product_AddPhotosToProduct_Handler,
+		},
+		{
+			MethodName: "DeletePhotosFromProduct",
+			Handler:    _Product_DeletePhotosFromProduct_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "sale.proto",
@@ -290,9 +362,11 @@ var Product_ServiceDesc = grpc.ServiceDesc{
 type ProcessClient interface {
 	CreateProcess(ctx context.Context, in *CreateProcessRequest, opts ...grpc.CallOption) (*ProcessResponse, error)
 	GetProcessOfUserByProductId(ctx context.Context, in *GetProcessOfUserByProductIdRequest, opts ...grpc.CallOption) (*GetProcessOfUserByProductIdResponse, error)
+	GetProcessByUserId(ctx context.Context, in *GetProcessByUserIdRequest, opts ...grpc.CallOption) (*GetProcessByUserIdResponse, error)
 	GetProcessByProductId(ctx context.Context, in *GetProcessByProductIdRequest, opts ...grpc.CallOption) (*GetProcessByProductIdResponse, error)
+	GetProcessById(ctx context.Context, in *GetProcessByIdRequest, opts ...grpc.CallOption) (*GetProcessByIdResponse, error)
 	UpdateProcess(ctx context.Context, in *UpdateProcessRequest, opts ...grpc.CallOption) (*Void, error)
-	CancelProcess(ctx context.Context, in *CancelProcessRequest, opts ...grpc.CallOption) (*Void, error)
+	CancelProcess(ctx context.Context, in *CancelProcessRequest, opts ...grpc.CallOption) (*CancelProcessResponse, error)
 }
 
 type processClient struct {
@@ -321,9 +395,27 @@ func (c *processClient) GetProcessOfUserByProductId(ctx context.Context, in *Get
 	return out, nil
 }
 
+func (c *processClient) GetProcessByUserId(ctx context.Context, in *GetProcessByUserIdRequest, opts ...grpc.CallOption) (*GetProcessByUserIdResponse, error) {
+	out := new(GetProcessByUserIdResponse)
+	err := c.cc.Invoke(ctx, "/sale.Process/GetProcessByUserId", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *processClient) GetProcessByProductId(ctx context.Context, in *GetProcessByProductIdRequest, opts ...grpc.CallOption) (*GetProcessByProductIdResponse, error) {
 	out := new(GetProcessByProductIdResponse)
 	err := c.cc.Invoke(ctx, "/sale.Process/GetProcessByProductId", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *processClient) GetProcessById(ctx context.Context, in *GetProcessByIdRequest, opts ...grpc.CallOption) (*GetProcessByIdResponse, error) {
+	out := new(GetProcessByIdResponse)
+	err := c.cc.Invoke(ctx, "/sale.Process/GetProcessById", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -339,8 +431,8 @@ func (c *processClient) UpdateProcess(ctx context.Context, in *UpdateProcessRequ
 	return out, nil
 }
 
-func (c *processClient) CancelProcess(ctx context.Context, in *CancelProcessRequest, opts ...grpc.CallOption) (*Void, error) {
-	out := new(Void)
+func (c *processClient) CancelProcess(ctx context.Context, in *CancelProcessRequest, opts ...grpc.CallOption) (*CancelProcessResponse, error) {
+	out := new(CancelProcessResponse)
 	err := c.cc.Invoke(ctx, "/sale.Process/CancelProcess", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -354,9 +446,11 @@ func (c *processClient) CancelProcess(ctx context.Context, in *CancelProcessRequ
 type ProcessServer interface {
 	CreateProcess(context.Context, *CreateProcessRequest) (*ProcessResponse, error)
 	GetProcessOfUserByProductId(context.Context, *GetProcessOfUserByProductIdRequest) (*GetProcessOfUserByProductIdResponse, error)
+	GetProcessByUserId(context.Context, *GetProcessByUserIdRequest) (*GetProcessByUserIdResponse, error)
 	GetProcessByProductId(context.Context, *GetProcessByProductIdRequest) (*GetProcessByProductIdResponse, error)
+	GetProcessById(context.Context, *GetProcessByIdRequest) (*GetProcessByIdResponse, error)
 	UpdateProcess(context.Context, *UpdateProcessRequest) (*Void, error)
-	CancelProcess(context.Context, *CancelProcessRequest) (*Void, error)
+	CancelProcess(context.Context, *CancelProcessRequest) (*CancelProcessResponse, error)
 	mustEmbedUnimplementedProcessServer()
 }
 
@@ -370,13 +464,19 @@ func (UnimplementedProcessServer) CreateProcess(context.Context, *CreateProcessR
 func (UnimplementedProcessServer) GetProcessOfUserByProductId(context.Context, *GetProcessOfUserByProductIdRequest) (*GetProcessOfUserByProductIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetProcessOfUserByProductId not implemented")
 }
+func (UnimplementedProcessServer) GetProcessByUserId(context.Context, *GetProcessByUserIdRequest) (*GetProcessByUserIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProcessByUserId not implemented")
+}
 func (UnimplementedProcessServer) GetProcessByProductId(context.Context, *GetProcessByProductIdRequest) (*GetProcessByProductIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetProcessByProductId not implemented")
+}
+func (UnimplementedProcessServer) GetProcessById(context.Context, *GetProcessByIdRequest) (*GetProcessByIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProcessById not implemented")
 }
 func (UnimplementedProcessServer) UpdateProcess(context.Context, *UpdateProcessRequest) (*Void, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateProcess not implemented")
 }
-func (UnimplementedProcessServer) CancelProcess(context.Context, *CancelProcessRequest) (*Void, error) {
+func (UnimplementedProcessServer) CancelProcess(context.Context, *CancelProcessRequest) (*CancelProcessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CancelProcess not implemented")
 }
 func (UnimplementedProcessServer) mustEmbedUnimplementedProcessServer() {}
@@ -428,6 +528,24 @@ func _Process_GetProcessOfUserByProductId_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Process_GetProcessByUserId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetProcessByUserIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProcessServer).GetProcessByUserId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sale.Process/GetProcessByUserId",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProcessServer).GetProcessByUserId(ctx, req.(*GetProcessByUserIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Process_GetProcessByProductId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetProcessByProductIdRequest)
 	if err := dec(in); err != nil {
@@ -442,6 +560,24 @@ func _Process_GetProcessByProductId_Handler(srv interface{}, ctx context.Context
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ProcessServer).GetProcessByProductId(ctx, req.(*GetProcessByProductIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Process_GetProcessById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetProcessByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProcessServer).GetProcessById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sale.Process/GetProcessById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProcessServer).GetProcessById(ctx, req.(*GetProcessByIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -498,8 +634,16 @@ var Process_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Process_GetProcessOfUserByProductId_Handler,
 		},
 		{
+			MethodName: "GetProcessByUserId",
+			Handler:    _Process_GetProcessByUserId_Handler,
+		},
+		{
 			MethodName: "GetProcessByProductId",
 			Handler:    _Process_GetProcessByProductId_Handler,
+		},
+		{
+			MethodName: "GetProcessById",
+			Handler:    _Process_GetProcessById_Handler,
 		},
 		{
 			MethodName: "UpdateProcess",
@@ -519,8 +663,8 @@ var Process_ServiceDesc = grpc.ServiceDesc{
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type WishlistClient interface {
 	CreateWishlist(ctx context.Context, in *CreateWishlistRequest, opts ...grpc.CallOption) (*WishlistResponse, error)
-	GetWishlist(ctx context.Context, in *GetWishlistRequest, opts ...grpc.CallOption) (*WishlistResponse, error)
-	GetWishlistById(ctx context.Context, in *GetWishlistRequest, opts ...grpc.CallOption) (*WishlistResponse, error)
+	GetWishlist(ctx context.Context, in *GetWishlistRequest, opts ...grpc.CallOption) (*GetWishlistResponse, error)
+	GetWishlistById(ctx context.Context, in *GetWishlistByIdRequest, opts ...grpc.CallOption) (*GetWishlistByIdResponse, error)
 }
 
 type wishlistClient struct {
@@ -540,8 +684,8 @@ func (c *wishlistClient) CreateWishlist(ctx context.Context, in *CreateWishlistR
 	return out, nil
 }
 
-func (c *wishlistClient) GetWishlist(ctx context.Context, in *GetWishlistRequest, opts ...grpc.CallOption) (*WishlistResponse, error) {
-	out := new(WishlistResponse)
+func (c *wishlistClient) GetWishlist(ctx context.Context, in *GetWishlistRequest, opts ...grpc.CallOption) (*GetWishlistResponse, error) {
+	out := new(GetWishlistResponse)
 	err := c.cc.Invoke(ctx, "/sale.Wishlist/GetWishlist", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -549,8 +693,8 @@ func (c *wishlistClient) GetWishlist(ctx context.Context, in *GetWishlistRequest
 	return out, nil
 }
 
-func (c *wishlistClient) GetWishlistById(ctx context.Context, in *GetWishlistRequest, opts ...grpc.CallOption) (*WishlistResponse, error) {
-	out := new(WishlistResponse)
+func (c *wishlistClient) GetWishlistById(ctx context.Context, in *GetWishlistByIdRequest, opts ...grpc.CallOption) (*GetWishlistByIdResponse, error) {
+	out := new(GetWishlistByIdResponse)
 	err := c.cc.Invoke(ctx, "/sale.Wishlist/GetWishlistById", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -563,8 +707,8 @@ func (c *wishlistClient) GetWishlistById(ctx context.Context, in *GetWishlistReq
 // for forward compatibility
 type WishlistServer interface {
 	CreateWishlist(context.Context, *CreateWishlistRequest) (*WishlistResponse, error)
-	GetWishlist(context.Context, *GetWishlistRequest) (*WishlistResponse, error)
-	GetWishlistById(context.Context, *GetWishlistRequest) (*WishlistResponse, error)
+	GetWishlist(context.Context, *GetWishlistRequest) (*GetWishlistResponse, error)
+	GetWishlistById(context.Context, *GetWishlistByIdRequest) (*GetWishlistByIdResponse, error)
 	mustEmbedUnimplementedWishlistServer()
 }
 
@@ -575,10 +719,10 @@ type UnimplementedWishlistServer struct {
 func (UnimplementedWishlistServer) CreateWishlist(context.Context, *CreateWishlistRequest) (*WishlistResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateWishlist not implemented")
 }
-func (UnimplementedWishlistServer) GetWishlist(context.Context, *GetWishlistRequest) (*WishlistResponse, error) {
+func (UnimplementedWishlistServer) GetWishlist(context.Context, *GetWishlistRequest) (*GetWishlistResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWishlist not implemented")
 }
-func (UnimplementedWishlistServer) GetWishlistById(context.Context, *GetWishlistRequest) (*WishlistResponse, error) {
+func (UnimplementedWishlistServer) GetWishlistById(context.Context, *GetWishlistByIdRequest) (*GetWishlistByIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWishlistById not implemented")
 }
 func (UnimplementedWishlistServer) mustEmbedUnimplementedWishlistServer() {}
@@ -631,7 +775,7 @@ func _Wishlist_GetWishlist_Handler(srv interface{}, ctx context.Context, dec fun
 }
 
 func _Wishlist_GetWishlistById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetWishlistRequest)
+	in := new(GetWishlistByIdRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -643,7 +787,7 @@ func _Wishlist_GetWishlistById_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: "/sale.Wishlist/GetWishlistById",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(WishlistServer).GetWishlistById(ctx, req.(*GetWishlistRequest))
+		return srv.(WishlistServer).GetWishlistById(ctx, req.(*GetWishlistByIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -677,7 +821,7 @@ var Wishlist_ServiceDesc = grpc.ServiceDesc{
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FeedbackClient interface {
 	CreateFeedback(ctx context.Context, in *CreateFeedbackRequest, opts ...grpc.CallOption) (*FeedbackResponse, error)
-	GetFeedback(ctx context.Context, in *GetFeedbackRequest, opts ...grpc.CallOption) (*FeedbackResponse, error)
+	GetFeedback(ctx context.Context, in *GetFeedbackRequest, opts ...grpc.CallOption) (*GetFeedbackResponse, error)
 	GetFeedbackOfUser(ctx context.Context, in *GetFeedbackOfUserRequest, opts ...grpc.CallOption) (*GetFeedbackOfUserResponse, error)
 }
 
@@ -698,8 +842,8 @@ func (c *feedbackClient) CreateFeedback(ctx context.Context, in *CreateFeedbackR
 	return out, nil
 }
 
-func (c *feedbackClient) GetFeedback(ctx context.Context, in *GetFeedbackRequest, opts ...grpc.CallOption) (*FeedbackResponse, error) {
-	out := new(FeedbackResponse)
+func (c *feedbackClient) GetFeedback(ctx context.Context, in *GetFeedbackRequest, opts ...grpc.CallOption) (*GetFeedbackResponse, error) {
+	out := new(GetFeedbackResponse)
 	err := c.cc.Invoke(ctx, "/sale.Feedback/GetFeedback", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -721,7 +865,7 @@ func (c *feedbackClient) GetFeedbackOfUser(ctx context.Context, in *GetFeedbackO
 // for forward compatibility
 type FeedbackServer interface {
 	CreateFeedback(context.Context, *CreateFeedbackRequest) (*FeedbackResponse, error)
-	GetFeedback(context.Context, *GetFeedbackRequest) (*FeedbackResponse, error)
+	GetFeedback(context.Context, *GetFeedbackRequest) (*GetFeedbackResponse, error)
 	GetFeedbackOfUser(context.Context, *GetFeedbackOfUserRequest) (*GetFeedbackOfUserResponse, error)
 	mustEmbedUnimplementedFeedbackServer()
 }
@@ -733,7 +877,7 @@ type UnimplementedFeedbackServer struct {
 func (UnimplementedFeedbackServer) CreateFeedback(context.Context, *CreateFeedbackRequest) (*FeedbackResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateFeedback not implemented")
 }
-func (UnimplementedFeedbackServer) GetFeedback(context.Context, *GetFeedbackRequest) (*FeedbackResponse, error) {
+func (UnimplementedFeedbackServer) GetFeedback(context.Context, *GetFeedbackRequest) (*GetFeedbackResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFeedback not implemented")
 }
 func (UnimplementedFeedbackServer) GetFeedbackOfUser(context.Context, *GetFeedbackOfUserRequest) (*GetFeedbackOfUserResponse, error) {
@@ -835,7 +979,7 @@ var Feedback_ServiceDesc = grpc.ServiceDesc{
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BoughtClient interface {
 	CreateBought(ctx context.Context, in *CreateBoughtRequest, opts ...grpc.CallOption) (*BoughtResponse, error)
-	GetBought(ctx context.Context, in *GetBoughtRequest, opts ...grpc.CallOption) (*BoughtResponse, error)
+	GetBought(ctx context.Context, in *GetBoughtRequest, opts ...grpc.CallOption) (*GetBoughtResponse, error)
 	GetBoughtOfUser(ctx context.Context, in *GetBoughtOfUserRequest, opts ...grpc.CallOption) (*GetBoughtOfUserResponse, error)
 }
 
@@ -856,8 +1000,8 @@ func (c *boughtClient) CreateBought(ctx context.Context, in *CreateBoughtRequest
 	return out, nil
 }
 
-func (c *boughtClient) GetBought(ctx context.Context, in *GetBoughtRequest, opts ...grpc.CallOption) (*BoughtResponse, error) {
-	out := new(BoughtResponse)
+func (c *boughtClient) GetBought(ctx context.Context, in *GetBoughtRequest, opts ...grpc.CallOption) (*GetBoughtResponse, error) {
+	out := new(GetBoughtResponse)
 	err := c.cc.Invoke(ctx, "/sale.Bought/GetBought", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -879,7 +1023,7 @@ func (c *boughtClient) GetBoughtOfUser(ctx context.Context, in *GetBoughtOfUserR
 // for forward compatibility
 type BoughtServer interface {
 	CreateBought(context.Context, *CreateBoughtRequest) (*BoughtResponse, error)
-	GetBought(context.Context, *GetBoughtRequest) (*BoughtResponse, error)
+	GetBought(context.Context, *GetBoughtRequest) (*GetBoughtResponse, error)
 	GetBoughtOfUser(context.Context, *GetBoughtOfUserRequest) (*GetBoughtOfUserResponse, error)
 	mustEmbedUnimplementedBoughtServer()
 }
@@ -891,7 +1035,7 @@ type UnimplementedBoughtServer struct {
 func (UnimplementedBoughtServer) CreateBought(context.Context, *CreateBoughtRequest) (*BoughtResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateBought not implemented")
 }
-func (UnimplementedBoughtServer) GetBought(context.Context, *GetBoughtRequest) (*BoughtResponse, error) {
+func (UnimplementedBoughtServer) GetBought(context.Context, *GetBoughtRequest) (*GetBoughtResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBought not implemented")
 }
 func (UnimplementedBoughtServer) GetBoughtOfUser(context.Context, *GetBoughtOfUserRequest) (*GetBoughtOfUserResponse, error) {
