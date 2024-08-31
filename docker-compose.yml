@@ -22,9 +22,14 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - db:/data/postgres
+      - db:/var/lib/postgresql/data
     networks:
       - sales
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PDB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
     
   migrate:
@@ -73,4 +78,5 @@ volumes:
   minio_data:
     driver: local
   db:
+    driver: local
    
