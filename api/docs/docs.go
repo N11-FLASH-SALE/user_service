@@ -95,46 +95,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/refresh": {
-            "post": {
-                "description": "it generates new access token",
-                "tags": [
-                    "auth"
-                ],
-                "summary": "Refresh token",
-                "parameters": [
-                    {
-                        "description": "enough",
-                        "name": "token",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/user.Tokens"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "tokens",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid date",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "error while reading from server",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "/auth/register": {
             "post": {
                 "description": "create new users",
@@ -510,14 +470,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "oldpassword": {
-                    "type": "string"
-                }
-            }
-        },
-        "user.Tokens": {
-            "type": "object",
-            "properties": {
-                "refreshtoken": {
                     "type": "string"
                 }
             }

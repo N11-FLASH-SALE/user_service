@@ -68,11 +68,6 @@ definitions:
       oldpassword:
         type: string
     type: object
-  user.Tokens:
-    properties:
-      refreshtoken:
-        type: string
-    type: object
   user.UpdateUserRequest:
     properties:
       address:
@@ -139,32 +134,6 @@ paths:
           schema:
             type: string
       summary: login user
-      tags:
-      - auth
-  /auth/refresh:
-    post:
-      description: it generates new access token
-      parameters:
-      - description: enough
-        in: body
-        name: token
-        required: true
-        schema:
-          $ref: '#/definitions/user.Tokens'
-      responses:
-        "200":
-          description: tokens
-          schema:
-            type: string
-        "400":
-          description: Invalid date
-          schema:
-            type: string
-        "500":
-          description: error while reading from server
-          schema:
-            type: string
-      summary: Refresh token
       tags:
       - auth
   /auth/register:
