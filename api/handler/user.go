@@ -74,12 +74,6 @@ func (h Handler) Login(c *gin.Context) {
 		return
 	}
 
-	err = auth.GeneratedAccessJWTToken(res)
-
-	if err != nil {
-		h.Log.Error(err.Error())
-		c.JSON(500, gin.H{"error": err.Error()})
-	}
 	err = auth.GeneratedRefreshJWTToken(res)
 	if err != nil {
 		h.Log.Error(err.Error())
@@ -88,50 +82,7 @@ func (h Handler) Login(c *gin.Context) {
 
 	h.Log.Info("login is succesfully ended")
 	c.JSON(http.StatusOK, gin.H{
-		"accesToken":   res.Accestoken,
 		"refreshToken": res.Refreshtoken,
-	})
-}
-
-// Refresh godoc
-// @Summary Refresh token
-// @Description it generates new access token
-// @Tags auth
-// @Param token body user.Tokens true "enough"
-// @Success 200 {object} string "tokens"
-// @Failure 400 {object} string "Invalid date"
-// @Failure 500 {object} string "error while reading from server"
-// @Router /auth/refresh [post]
-func (h Handler) Refresh(c *gin.Context) {
-	h.Log.Info("Refresh is working")
-	tok := pb.Tokens{}
-	if err := c.BindJSON(&tok); err != nil {
-		h.Log.Error(err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	}
-
-	req := pb.LoginRes{Refreshtoken: tok.Refreshtoken}
-
-	_, err := auth.ValidateRefreshToken(req.Refreshtoken)
-	if err != nil {
-		h.Log.Error(err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	}
-	err = auth.GetUserIdFromRefreshToken(&req)
-	if err != nil {
-		h.Log.Error(err.Error())
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
-	}
-
-	err = auth.GeneratedAccessJWTToken(&req)
-	if err != nil {
-		h.Log.Error(err.Error())
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
-	}
-	h.Log.Info("Refresh is succesfully ended")
-	c.JSON(http.StatusOK, gin.H{
-		"accesToken":   req.Accestoken,
-		"refreshToken": req.Refreshtoken,
 	})
 }
 
@@ -236,8 +187,8 @@ func (h Handler) Logout(c *gin.Context) {
 func (h Handler) GetUserProfile(c *gin.Context) {
 	h.Log.Info("GetUserProfile is working")
 	var req pb.LoginRes
-	req.Accestoken = c.GetHeader("Authorization")
-	err := auth.GetUserIdFromAccesToken(&req)
+	req.Refreshtoken = c.GetHeader("Authorization")
+	err := auth.GetUserIdFromRefreshToken(&req)
 	if err != nil {
 		h.Log.Error(err.Error())
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
@@ -266,8 +217,8 @@ func (h Handler) GetUserProfile(c *gin.Context) {
 func (h Handler) UpdateUserProfile(c *gin.Context) {
 	h.Log.Info("UpdateUserProfile is working")
 	var req pb.LoginRes
-	req.Accestoken = c.GetHeader("Authorization")
-	err := auth.GetUserIdFromAccesToken(&req)
+	req.Refreshtoken = c.GetHeader("Authorization")
+	err := auth.GetUserIdFromRefreshToken(&req)
 	if err != nil {
 		h.Log.Error(err.Error())
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
@@ -303,8 +254,8 @@ func (h Handler) UpdateUserProfile(c *gin.Context) {
 func (h Handler) ChangePassword(c *gin.Context) {
 	h.Log.Info("ChangePassword is working")
 	var req pb.LoginRes
-	req.Accestoken = c.GetHeader("Authorization")
-	err := auth.GetUserIdFromAccesToken(&req)
+	req.Refreshtoken = c.GetHeader("Authorization")
+	err := auth.GetUserIdFromRefreshToken(&req)
 	if err != nil {
 		h.Log.Error(err.Error())
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
@@ -399,8 +350,8 @@ func (h *Handler) UploadMediaUser(c *gin.Context) {
 	// minio end
 
 	var req pb.LoginRes
-	req.Accestoken = c.GetHeader("Authorization")
-	err = auth.GetUserIdFromAccesToken(&req)
+	req.Refreshtoken = c.GetHeader("Authorization")
+	err = auth.GetUserIdFromRefreshToken(&req)
 	if err != nil {
 		h.Log.Error(err.Error())
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})

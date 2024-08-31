@@ -24,7 +24,6 @@ func Router(hand *handler.Handler) *gin.Engine {
 	{
 		auth.POST("/register", hand.Register)
 		auth.POST("/login", hand.Login)
-		auth.POST("/refresh", hand.Refresh)
 		auth.POST("/forgot-password", hand.ForgotPassword)
 		auth.POST("/reset-password", hand.ResetPassword)
 	}

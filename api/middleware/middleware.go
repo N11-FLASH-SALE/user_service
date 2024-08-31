@@ -8,16 +8,16 @@ import (
 )
 
 func Check(c *gin.Context) {
-	accessToken := c.GetHeader("Authorization")
+	refreshToken := c.GetHeader("Authorization")
 
-	if accessToken == "" {
+	if refreshToken == "" {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"error": "Authorization is required",
 		})
 		return
 	}
 
-	_, err := auth.ValidateAccesToken(accessToken)
+	_, err := auth.ValidateRefreshToken(refreshToken)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"error": "Invalid token provided",

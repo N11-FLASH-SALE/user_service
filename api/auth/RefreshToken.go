@@ -16,7 +16,7 @@ func GeneratedRefreshJWTToken(req *pb.LoginRes) error {
 	claims["user_id"] = req.Id
 	claims["role"] = req.Role
 	claims["iat"] = time.Now().Unix()
-	claims["exp"] = time.Now().Add(24 * time.Hour).Unix()
+	claims["exp"] = time.Now().AddDate(0, 6, 0).Unix()
 
 	newToken, err := token.SignedString([]byte(conf.Token.REFRESH_KEY))
 	if err != nil {
