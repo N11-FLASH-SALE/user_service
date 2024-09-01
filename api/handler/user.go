@@ -293,12 +293,6 @@ func (h *Handler) UploadMediaUser(c *gin.Context) {
 	header, _ := c.FormFile("file")
 
 	url := filepath.Join("media/users", header.Filename)
-
-	err := c.SaveUploadedFile(header, url)
-	if err != nil {
-		return
-	}
-
 	// minio start
 
 	fileExt := filepath.Ext(header.Filename)
@@ -358,7 +352,7 @@ func (h *Handler) UploadMediaUser(c *gin.Context) {
 		return
 	}
 
-	reqmain := pb.UpdateUserRequest{Id: req.Id, Photo: url}
+	reqmain := pb.UpdateUserRequest{Id: req.Id, Photo: madeUrl}
 	_, err = h.User.UpdateUser(c, &reqmain)
 	if err != nil {
 		h.Log.Error(err.Error())
@@ -367,7 +361,6 @@ func (h *Handler) UploadMediaUser(c *gin.Context) {
 	}
 	h.Log.Info("UploadMediaUser finished successfully")
 	c.JSON(200, gin.H{
-		"url":       url,
 		"minio url": madeUrl,
 	})
 
