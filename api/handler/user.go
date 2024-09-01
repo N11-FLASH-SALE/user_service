@@ -292,7 +292,7 @@ func (h *Handler) UploadMediaUser(c *gin.Context) {
 	h.Log.Info("UploadMediaUser started")
 	header, _ := c.FormFile("file")
 
-	url := filepath.Join("media/users", header.Filename)
+	url := filepath.Join("temp", header.Filename)
 	// minio start
 
 	fileExt := filepath.Ext(header.Filename)
