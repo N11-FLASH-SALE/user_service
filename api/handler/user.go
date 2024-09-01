@@ -292,7 +292,13 @@ func (h *Handler) UploadMediaUser(c *gin.Context) {
 	h.Log.Info("UploadMediaUser started")
 	header, _ := c.FormFile("file")
 
-	url := filepath.Join("temp", header.Filename)
+	url := filepath.Join("media/users", header.Filename)
+
+	err := c.SaveUploadedFile(header, url)
+	if err != nil {
+		return
+	}
+
 	// minio start
 
 	fileExt := filepath.Ext(header.Filename)
@@ -318,17 +324,17 @@ func (h *Handler) UploadMediaUser(c *gin.Context) {
 	}
 
 	policy := fmt.Sprintf(`{
-		"Version": "2012-10-17",
-		"Statement": [
-			{
-				"Effect": "Allow",
-				"Principal": {
-					"AWS": ["*"]
-				},
-				"Action": ["s3:GetObject"],
-				"Resource": ["arn:aws:s3:::%s/*"]
-			}
-		]
+	 "Version": "2012-10-17",
+	 "Statement": [
+	  {
+	   "Effect": "Allow",
+	   "Principal": {
+		"AWS": ["*"]
+	   },
+	   "Action": ["s3:GetObject"],
+	   "Resource": ["arn:aws:s3:::%s/*"]
+	  }
+	 ]
 	}`, "photos")
 
 	err = minioClient.SetBucketPolicy(context.Background(), "photos", policy)
@@ -352,7 +358,7 @@ func (h *Handler) UploadMediaUser(c *gin.Context) {
 		return
 	}
 
-	reqmain := pb.UpdateUserRequest{Id: req.Id, Photo: madeUrl}
+	reqmain := pb.UpdateUserRequest{Id: req.Id, Photo: url}
 	_, err = h.User.UpdateUser(c, &reqmain)
 	if err != nil {
 		h.Log.Error(err.Error())
@@ -361,6 +367,7 @@ func (h *Handler) UploadMediaUser(c *gin.Context) {
 	}
 	h.Log.Info("UploadMediaUser finished successfully")
 	c.JSON(200, gin.H{
+		"url":       url,
 		"minio url": madeUrl,
 	})
 
