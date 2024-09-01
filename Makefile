@@ -22,5 +22,5 @@ create_migrate:
 	migrate create -ext sql -dir migrations -seq $$filename
 swag:
 	~/go/bin/swag init -g ./api/router.go -o api/docs
-run-service:
+run:
 	go run cmd/main.go
