@@ -290,19 +290,16 @@ func (h Handler) ChangePassword(c *gin.Context) {
 // @Router /user/photo [post]
 func (h *Handler) UploadMediaUser(c *gin.Context) {
 	h.Log.Info("UploadMediaUser started")
-	header, _ := c.FormFile("file")
-
-	url := filepath.Join("media/users", header.Filename)
-
-	err := c.SaveUploadedFile(header, url)
+	file, header, err := c.Request.FormFile("file")
 	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Error retrieving the file"})
 		return
 	}
+	defer file.Close()
 
 	// minio start
 
 	fileExt := filepath.Ext(header.Filename)
-
 	println("\n File Ext:", fileExt)
 
 	newFile := uuid.NewString() + fileExt
@@ -315,7 +312,7 @@ func (h *Handler) UploadMediaUser(c *gin.Context) {
 		return
 	}
 
-	info, err := minioClient.FPutObject(context.Background(), "photos", newFile, url, minio.PutObjectOptions{
+	info, err := minioClient.PutObject(context.Background(), "photos", newFile, file, header.Size, minio.PutObjectOptions{
 		ContentType: "image/jpeg",
 	})
 	if err != nil {
@@ -358,7 +355,7 @@ func (h *Handler) UploadMediaUser(c *gin.Context) {
 		return
 	}
 
-	reqmain := pb.UpdateUserRequest{Id: req.Id, Photo: url}
+	reqmain := pb.UpdateUserRequest{Id: req.Id, Photo: madeUrl}
 	_, err = h.User.UpdateUser(c, &reqmain)
 	if err != nil {
 		h.Log.Error(err.Error())
@@ -367,7 +364,6 @@ func (h *Handler) UploadMediaUser(c *gin.Context) {
 	}
 	h.Log.Info("UploadMediaUser finished successfully")
 	c.JSON(200, gin.H{
-		"url":       url,
 		"minio url": madeUrl,
 	})
 
