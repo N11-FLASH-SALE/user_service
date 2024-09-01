@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS cards (
     user_id UUID NOT NULL REFERENCES users(id),
     card_number VARCHAR(20) NOT NULL,
     expiration_date VARCHAR(5) NOT NULL,
-    security_code_hash VARCHAR(4) NOT NULL,
+    security_code_hash VARCHAR NOT NULL,
     amount DOUBLE PRECISION NOT NULL DEFAULT 100000,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
