@@ -84,9 +84,9 @@ func (r *CardRepository) UpdateCardAmount(ctx context.Context, req *pb.UpdateCar
 	query := `
         UPDATE cards
         SET amount = $1, updated_at = current_timestamp
-        WHERE id = $2
+        WHERE card_number = $2
     `
-	result, err := r.Db.ExecContext(ctx, query, req.Amount, req.CardId)
+	result, err := r.Db.ExecContext(ctx, query, req.Amount, req.CardNumber)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update card amount: %w", err)
 	}
