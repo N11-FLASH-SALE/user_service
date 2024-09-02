@@ -65,7 +65,7 @@ func TestGetCardAmount(t *testing.T) {
 	repo := NewCardRepository(db)
 
 	req := pb.GetCardAmountReq{
-		CardId: "card123",
+		CardNumber: "card123",
 	}
 	ctx := context.Background()
 

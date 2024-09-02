@@ -25,6 +25,7 @@ type ProductClient interface {
 	CreateProduct(ctx context.Context, in *CreateProductRequest, opts ...grpc.CallOption) (*ProductId, error)
 	GetProduct(ctx context.Context, in *GetProductRequest, opts ...grpc.CallOption) (*GetProductResponse, error)
 	GetProductById(ctx context.Context, in *ProductId, opts ...grpc.CallOption) (*GetProductByIdResponse, error)
+	GetProductsByUserId(ctx context.Context, in *GetProductsByUserIdRequest, opts ...grpc.CallOption) (*GetProductsByUserIdResponse, error)
 	UpdateProduct(ctx context.Context, in *UpdateProductRequest, opts ...grpc.CallOption) (*Void, error)
 	DeleteProduct(ctx context.Context, in *ProductId, opts ...grpc.CallOption) (*Void, error)
 	IsProductOk(ctx context.Context, in *ProductId, opts ...grpc.CallOption) (*Void, error)
@@ -61,6 +62,15 @@ func (c *productClient) GetProduct(ctx context.Context, in *GetProductRequest, o
 func (c *productClient) GetProductById(ctx context.Context, in *ProductId, opts ...grpc.CallOption) (*GetProductByIdResponse, error) {
 	out := new(GetProductByIdResponse)
 	err := c.cc.Invoke(ctx, "/sale.Product/GetProductById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *productClient) GetProductsByUserId(ctx context.Context, in *GetProductsByUserIdRequest, opts ...grpc.CallOption) (*GetProductsByUserIdResponse, error) {
+	out := new(GetProductsByUserIdResponse)
+	err := c.cc.Invoke(ctx, "/sale.Product/GetProductsByUserId", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -119,6 +129,7 @@ type ProductServer interface {
 	CreateProduct(context.Context, *CreateProductRequest) (*ProductId, error)
 	GetProduct(context.Context, *GetProductRequest) (*GetProductResponse, error)
 	GetProductById(context.Context, *ProductId) (*GetProductByIdResponse, error)
+	GetProductsByUserId(context.Context, *GetProductsByUserIdRequest) (*GetProductsByUserIdResponse, error)
 	UpdateProduct(context.Context, *UpdateProductRequest) (*Void, error)
 	DeleteProduct(context.Context, *ProductId) (*Void, error)
 	IsProductOk(context.Context, *ProductId) (*Void, error)
@@ -139,6 +150,9 @@ func (UnimplementedProductServer) GetProduct(context.Context, *GetProductRequest
 }
 func (UnimplementedProductServer) GetProductById(context.Context, *ProductId) (*GetProductByIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetProductById not implemented")
+}
+func (UnimplementedProductServer) GetProductsByUserId(context.Context, *GetProductsByUserIdRequest) (*GetProductsByUserIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProductsByUserId not implemented")
 }
 func (UnimplementedProductServer) UpdateProduct(context.Context, *UpdateProductRequest) (*Void, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateProduct not implemented")
@@ -218,6 +232,24 @@ func _Product_GetProductById_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ProductServer).GetProductById(ctx, req.(*ProductId))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Product_GetProductsByUserId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetProductsByUserIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductServer).GetProductsByUserId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sale.Product/GetProductsByUserId",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductServer).GetProductsByUserId(ctx, req.(*GetProductsByUserIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -330,6 +362,10 @@ var Product_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetProductById",
 			Handler:    _Product_GetProductById_Handler,
+		},
+		{
+			MethodName: "GetProductsByUserId",
+			Handler:    _Product_GetProductsByUserId_Handler,
 		},
 		{
 			MethodName: "UpdateProduct",

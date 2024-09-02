@@ -66,10 +66,10 @@ func (r *CardRepository) GetCardAmount(ctx context.Context, req *pb.GetCardAmoun
 	query := `
         SELECT amount
         FROM cards
-        WHERE id = $1
+        WHERE card_number = $1
     `
 	var amount string
-	err := r.Db.QueryRowContext(ctx, query, req.CardId).Scan(&amount)
+	err := r.Db.QueryRowContext(ctx, query, req.CardNumber).Scan(&amount)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, fmt.Errorf("card not found")
