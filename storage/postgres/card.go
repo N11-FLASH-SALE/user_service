@@ -68,7 +68,7 @@ func (r *CardRepository) GetCardAmount(ctx context.Context, req *pb.GetCardAmoun
         FROM cards
         WHERE card_number = $1
     `
-	var amount string
+	var amount float64
 	err := r.Db.QueryRowContext(ctx, query, req.CardNumber).Scan(&amount)
 	if err != nil {
 		if err == sql.ErrNoRows {

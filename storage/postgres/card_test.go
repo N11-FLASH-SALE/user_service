@@ -88,7 +88,7 @@ func TestUpdateCardAmount(t *testing.T) {
 
 	req := pb.UpdateCardAmountReq{
 		CardId: "card123",
-		Amount: "100.00",
+		Amount: 100.00,
 	}
 	ctx := context.Background()
 
