@@ -23,7 +23,7 @@ func NewNotificationsService(db *sql.DB, Logger *slog.Logger) *NotificationsServ
 	}
 }
 
-func (s *NotificationsService) CreateNotifications(ctx context.Context, req *pb.CreateNotificationsReq) (*pb.CreateNotificationsRes, error) {
+func (s *NotificationsService) CreateNotification(ctx context.Context, req *pb.CreateNotificationsReq) (*pb.CreateNotificationsRes, error) {
 	s.Logger.Info("CreateNotifications rpc method is working")
 	resp, err := s.Storage.Notifications().CreateNotifications(ctx, req)
 	if err != nil {
