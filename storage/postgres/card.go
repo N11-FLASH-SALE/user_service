@@ -83,7 +83,7 @@ func (r *CardRepository) GetCardAmount(ctx context.Context, req *pb.GetCardAmoun
 func (r *CardRepository) UpdateCardAmount(ctx context.Context, req *pb.UpdateCardAmountReq) (*pb.UpdateCardAmountRes, error) {
 	query := `
         UPDATE cards
-        SET amount = $1, updated_at = current_timestamp
+        SET amount = $1
         WHERE card_number = $2
     `
 	result, err := r.Db.ExecContext(ctx, query, req.Amount, req.CardNumber)
