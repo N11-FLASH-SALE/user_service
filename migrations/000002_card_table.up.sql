@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS cards (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id),
+    card_number VARCHAR(20) UNIQUE NOT NULL,
+    expiration_date VARCHAR(5) NOT NULL,
+    security_code_hash VARCHAR NOT NULL,
+    amount DOUBLE PRECISION NOT NULL DEFAULT 100000,
+    card_type VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
