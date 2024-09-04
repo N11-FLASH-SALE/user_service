@@ -1285,6 +1285,53 @@ func (x *CreateCardRes) GetId() string {
 	return ""
 }
 
+type DeleteCardReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	CardNumber string `protobuf:"bytes,1,opt,name=card_number,json=cardNumber,proto3" json:"card_number,omitempty"`
+}
+
+func (x *DeleteCardReq) Reset() {
+	*x = DeleteCardReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_user_proto_msgTypes[22]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteCardReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteCardReq) ProtoMessage() {}
+
+func (x *DeleteCardReq) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[22]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteCardReq.ProtoReflect.Descriptor instead.
+func (*DeleteCardReq) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *DeleteCardReq) GetCardNumber() string {
+	if x != nil {
+		return x.CardNumber
+	}
+	return ""
+}
+
 type GetCardsOfUserReq struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1296,7 +1343,7 @@ type GetCardsOfUserReq struct {
 func (x *GetCardsOfUserReq) Reset() {
 	*x = GetCardsOfUserReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_user_proto_msgTypes[22]
+		mi := &file_user_proto_msgTypes[23]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1309,7 +1356,7 @@ func (x *GetCardsOfUserReq) String() string {
 func (*GetCardsOfUserReq) ProtoMessage() {}
 
 func (x *GetCardsOfUserReq) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[22]
+	mi := &file_user_proto_msgTypes[23]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1322,7 +1369,7 @@ func (x *GetCardsOfUserReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCardsOfUserReq.ProtoReflect.Descriptor instead.
 func (*GetCardsOfUserReq) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{22}
+	return file_user_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *GetCardsOfUserReq) GetUserId() string {
@@ -1341,12 +1388,13 @@ type Card struct {
 	UserId         string `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	CardNumber     string `protobuf:"bytes,3,opt,name=card_number,json=cardNumber,proto3" json:"card_number,omitempty"`
 	ExpirationDate string `protobuf:"bytes,4,opt,name=expiration_date,json=expirationDate,proto3" json:"expiration_date,omitempty"`
+	CardType       string `protobuf:"bytes,5,opt,name=card_type,json=cardType,proto3" json:"card_type,omitempty"`
 }
 
 func (x *Card) Reset() {
 	*x = Card{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_user_proto_msgTypes[23]
+		mi := &file_user_proto_msgTypes[24]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1359,7 +1407,7 @@ func (x *Card) String() string {
 func (*Card) ProtoMessage() {}
 
 func (x *Card) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[23]
+	mi := &file_user_proto_msgTypes[24]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1372,7 +1420,7 @@ func (x *Card) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Card.ProtoReflect.Descriptor instead.
 func (*Card) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{23}
+	return file_user_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *Card) GetId() string {
@@ -1403,6 +1451,13 @@ func (x *Card) GetExpirationDate() string {
 	return ""
 }
 
+func (x *Card) GetCardType() string {
+	if x != nil {
+		return x.CardType
+	}
+	return ""
+}
+
 type GetCardsOfUserRes struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1414,7 +1469,7 @@ type GetCardsOfUserRes struct {
 func (x *GetCardsOfUserRes) Reset() {
 	*x = GetCardsOfUserRes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_user_proto_msgTypes[24]
+		mi := &file_user_proto_msgTypes[25]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1427,7 +1482,7 @@ func (x *GetCardsOfUserRes) String() string {
 func (*GetCardsOfUserRes) ProtoMessage() {}
 
 func (x *GetCardsOfUserRes) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[24]
+	mi := &file_user_proto_msgTypes[25]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1440,7 +1495,7 @@ func (x *GetCardsOfUserRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCardsOfUserRes.ProtoReflect.Descriptor instead.
 func (*GetCardsOfUserRes) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{24}
+	return file_user_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *GetCardsOfUserRes) GetCards() []*Card {
@@ -1461,7 +1516,7 @@ type GetCardAmountReq struct {
 func (x *GetCardAmountReq) Reset() {
 	*x = GetCardAmountReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_user_proto_msgTypes[25]
+		mi := &file_user_proto_msgTypes[26]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1474,7 +1529,7 @@ func (x *GetCardAmountReq) String() string {
 func (*GetCardAmountReq) ProtoMessage() {}
 
 func (x *GetCardAmountReq) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[25]
+	mi := &file_user_proto_msgTypes[26]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1487,7 +1542,7 @@ func (x *GetCardAmountReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCardAmountReq.ProtoReflect.Descriptor instead.
 func (*GetCardAmountReq) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{25}
+	return file_user_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *GetCardAmountReq) GetCardNumber() string {
@@ -1508,7 +1563,7 @@ type GetCardAmountRes struct {
 func (x *GetCardAmountRes) Reset() {
 	*x = GetCardAmountRes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_user_proto_msgTypes[26]
+		mi := &file_user_proto_msgTypes[27]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1521,7 +1576,7 @@ func (x *GetCardAmountRes) String() string {
 func (*GetCardAmountRes) ProtoMessage() {}
 
 func (x *GetCardAmountRes) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[26]
+	mi := &file_user_proto_msgTypes[27]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1534,7 +1589,7 @@ func (x *GetCardAmountRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCardAmountRes.ProtoReflect.Descriptor instead.
 func (*GetCardAmountRes) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{26}
+	return file_user_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *GetCardAmountRes) GetAmount() float64 {
@@ -1556,7 +1611,7 @@ type UpdateCardAmountReq struct {
 func (x *UpdateCardAmountReq) Reset() {
 	*x = UpdateCardAmountReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_user_proto_msgTypes[27]
+		mi := &file_user_proto_msgTypes[28]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1569,7 +1624,7 @@ func (x *UpdateCardAmountReq) String() string {
 func (*UpdateCardAmountReq) ProtoMessage() {}
 
 func (x *UpdateCardAmountReq) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[27]
+	mi := &file_user_proto_msgTypes[28]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1582,7 +1637,7 @@ func (x *UpdateCardAmountReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateCardAmountReq.ProtoReflect.Descriptor instead.
 func (*UpdateCardAmountReq) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{27}
+	return file_user_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *UpdateCardAmountReq) GetCardNumber() string {
@@ -1610,7 +1665,7 @@ type UpdateCardAmountRes struct {
 func (x *UpdateCardAmountRes) Reset() {
 	*x = UpdateCardAmountRes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_user_proto_msgTypes[28]
+		mi := &file_user_proto_msgTypes[29]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1623,7 +1678,7 @@ func (x *UpdateCardAmountRes) String() string {
 func (*UpdateCardAmountRes) ProtoMessage() {}
 
 func (x *UpdateCardAmountRes) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[28]
+	mi := &file_user_proto_msgTypes[29]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1636,7 +1691,7 @@ func (x *UpdateCardAmountRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateCardAmountRes.ProtoReflect.Descriptor instead.
 func (*UpdateCardAmountRes) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{28}
+	return file_user_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *UpdateCardAmountRes) GetVoid() string {
@@ -1758,18 +1813,23 @@ var file_user_proto_rawDesc = []byte{
 	0x63, 0x6f, 0x64, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x73, 0x65, 0x63, 0x75,
 	0x72, 0x69, 0x74, 0x79, 0x43, 0x6f, 0x64, 0x65, 0x22, 0x1f, 0x0a, 0x0d, 0x43, 0x72, 0x65, 0x61,
 	0x74, 0x65, 0x43, 0x61, 0x72, 0x64, 0x52, 0x65, 0x73, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0x2c, 0x0a, 0x11, 0x47, 0x65, 0x74,
-	0x43, 0x61, 0x72, 0x64, 0x73, 0x4f, 0x66, 0x55, 0x73, 0x65, 0x72, 0x52, 0x65, 0x71, 0x12, 0x17,
-	0x0a, 0x07, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x22, 0x79, 0x0a, 0x04, 0x43, 0x61, 0x72, 0x64, 0x12,
-	0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12,
-	0x17, 0x0a, 0x07, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x1f, 0x0a, 0x0b, 0x63, 0x61, 0x72, 0x64,
-	0x5f, 0x6e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x63,
-	0x61, 0x72, 0x64, 0x4e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x12, 0x27, 0x0a, 0x0f, 0x65, 0x78, 0x70,
-	0x69, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x64, 0x61, 0x74, 0x65, 0x18, 0x04, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x0e, 0x65, 0x78, 0x70, 0x69, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x44, 0x61,
-	0x74, 0x65, 0x22, 0x35, 0x0a, 0x11, 0x47, 0x65, 0x74, 0x43, 0x61, 0x72, 0x64, 0x73, 0x4f, 0x66,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0x30, 0x0a, 0x0d, 0x44, 0x65, 0x6c,
+	0x65, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64, 0x52, 0x65, 0x71, 0x12, 0x1f, 0x0a, 0x0b, 0x63, 0x61,
+	0x72, 0x64, 0x5f, 0x6e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x0a, 0x63, 0x61, 0x72, 0x64, 0x4e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x22, 0x2c, 0x0a, 0x11, 0x47,
+	0x65, 0x74, 0x43, 0x61, 0x72, 0x64, 0x73, 0x4f, 0x66, 0x55, 0x73, 0x65, 0x72, 0x52, 0x65, 0x71,
+	0x12, 0x17, 0x0a, 0x07, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x22, 0x96, 0x01, 0x0a, 0x04, 0x43, 0x61,
+	0x72, 0x64, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02,
+	0x69, 0x64, 0x12, 0x17, 0x0a, 0x07, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x1f, 0x0a, 0x0b, 0x63,
+	0x61, 0x72, 0x64, 0x5f, 0x6e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x0a, 0x63, 0x61, 0x72, 0x64, 0x4e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x12, 0x27, 0x0a, 0x0f,
+	0x65, 0x78, 0x70, 0x69, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x64, 0x61, 0x74, 0x65, 0x18,
+	0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0e, 0x65, 0x78, 0x70, 0x69, 0x72, 0x61, 0x74, 0x69, 0x6f,
+	0x6e, 0x44, 0x61, 0x74, 0x65, 0x12, 0x1b, 0x0a, 0x09, 0x63, 0x61, 0x72, 0x64, 0x5f, 0x74, 0x79,
+	0x70, 0x65, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x63, 0x61, 0x72, 0x64, 0x54, 0x79,
+	0x70, 0x65, 0x22, 0x35, 0x0a, 0x11, 0x47, 0x65, 0x74, 0x43, 0x61, 0x72, 0x64, 0x73, 0x4f, 0x66,
 	0x55, 0x73, 0x65, 0x72, 0x52, 0x65, 0x73, 0x12, 0x20, 0x0a, 0x05, 0x63, 0x61, 0x72, 0x64, 0x73,
 	0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x2e, 0x43, 0x61,
 	0x72, 0x64, 0x52, 0x05, 0x63, 0x61, 0x72, 0x64, 0x73, 0x22, 0x33, 0x0a, 0x10, 0x47, 0x65, 0x74,
@@ -1833,7 +1893,7 @@ var file_user_proto_rawDesc = []byte{
 	0x69, 0x6f, 0x6e, 0x41, 0x73, 0x52, 0x65, 0x61, 0x64, 0x52, 0x65, 0x71, 0x1a, 0x25, 0x2e, 0x75,
 	0x73, 0x65, 0x72, 0x2e, 0x47, 0x65, 0x74, 0x41, 0x6e, 0x64, 0x4d, 0x61, 0x72, 0x6b, 0x4e, 0x6f,
 	0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x41, 0x73, 0x52, 0x65, 0x61, 0x64,
-	0x52, 0x65, 0x73, 0x32, 0x8e, 0x02, 0x0a, 0x05, 0x43, 0x61, 0x72, 0x64, 0x73, 0x12, 0x36, 0x0a,
+	0x52, 0x65, 0x73, 0x32, 0xbd, 0x02, 0x0a, 0x05, 0x43, 0x61, 0x72, 0x64, 0x73, 0x12, 0x36, 0x0a,
 	0x0a, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64, 0x12, 0x13, 0x2e, 0x75, 0x73,
 	0x65, 0x72, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64, 0x52, 0x65, 0x71,
 	0x1a, 0x13, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x61,
@@ -1850,8 +1910,11 @@ var file_user_proto_rawDesc = []byte{
 	0x2e, 0x75, 0x73, 0x65, 0x72, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64,
 	0x41, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x1a, 0x19, 0x2e, 0x75, 0x73, 0x65, 0x72,
 	0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64, 0x41, 0x6d, 0x6f, 0x75, 0x6e,
-	0x74, 0x52, 0x65, 0x73, 0x42, 0x0f, 0x5a, 0x0d, 0x67, 0x65, 0x6e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x2f, 0x75, 0x73, 0x65, 0x72, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x74, 0x52, 0x65, 0x73, 0x12, 0x2d, 0x0a, 0x0a, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x61,
+	0x72, 0x64, 0x12, 0x13, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65,
+	0x43, 0x61, 0x72, 0x64, 0x52, 0x65, 0x71, 0x1a, 0x0a, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x2e, 0x56,
+	0x6f, 0x69, 0x64, 0x42, 0x0f, 0x5a, 0x0d, 0x67, 0x65, 0x6e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f,
+	0x75, 0x73, 0x65, 0x72, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1866,7 +1929,7 @@ func file_user_proto_rawDescGZIP() []byte {
 	return file_user_proto_rawDescData
 }
 
-var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
+var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
 var file_user_proto_goTypes = []interface{}{
 	(*RegisterReq)(nil),                     // 0: user.RegisterReq
 	(*RegisterRes)(nil),                     // 1: user.RegisterRes
@@ -1890,18 +1953,19 @@ var file_user_proto_goTypes = []interface{}{
 	(*GetAndMarkNotificationAsReadRes)(nil), // 19: user.GetAndMarkNotificationAsReadRes
 	(*CreateCardReq)(nil),                   // 20: user.CreateCardReq
 	(*CreateCardRes)(nil),                   // 21: user.CreateCardRes
-	(*GetCardsOfUserReq)(nil),               // 22: user.GetCardsOfUserReq
-	(*Card)(nil),                            // 23: user.Card
-	(*GetCardsOfUserRes)(nil),               // 24: user.GetCardsOfUserRes
-	(*GetCardAmountReq)(nil),                // 25: user.GetCardAmountReq
-	(*GetCardAmountRes)(nil),                // 26: user.GetCardAmountRes
-	(*UpdateCardAmountReq)(nil),             // 27: user.UpdateCardAmountReq
-	(*UpdateCardAmountRes)(nil),             // 28: user.UpdateCardAmountRes
+	(*DeleteCardReq)(nil),                   // 22: user.DeleteCardReq
+	(*GetCardsOfUserReq)(nil),               // 23: user.GetCardsOfUserReq
+	(*Card)(nil),                            // 24: user.Card
+	(*GetCardsOfUserRes)(nil),               // 25: user.GetCardsOfUserRes
+	(*GetCardAmountReq)(nil),                // 26: user.GetCardAmountReq
+	(*GetCardAmountRes)(nil),                // 27: user.GetCardAmountRes
+	(*UpdateCardAmountReq)(nil),             // 28: user.UpdateCardAmountReq
+	(*UpdateCardAmountRes)(nil),             // 29: user.UpdateCardAmountRes
 }
 var file_user_proto_depIdxs = []int32{
 	16, // 0: user.GetNotificationsResponse.notifications:type_name -> user.Notification
 	16, // 1: user.GetAndMarkNotificationAsReadRes.notifications:type_name -> user.Notification
-	23, // 2: user.GetCardsOfUserRes.cards:type_name -> user.Card
+	24, // 2: user.GetCardsOfUserRes.cards:type_name -> user.Card
 	0,  // 3: user.User.Register:input_type -> user.RegisterReq
 	2,  // 4: user.User.Login:input_type -> user.LoginReq
 	10, // 5: user.User.GetUSerByEmail:input_type -> user.GetUSerByEmailReq
@@ -1915,27 +1979,29 @@ var file_user_proto_depIdxs = []int32{
 	15, // 13: user.Notifications.GetAllNotifications:input_type -> user.GetNotificationsReq
 	18, // 14: user.Notifications.GetAndMarkNotificationAsRead:input_type -> user.GetAndMarkNotificationAsReadReq
 	20, // 15: user.Cards.CreateCard:input_type -> user.CreateCardReq
-	22, // 16: user.Cards.GetCardsOfUser:input_type -> user.GetCardsOfUserReq
-	25, // 17: user.Cards.GetCardAmount:input_type -> user.GetCardAmountReq
-	27, // 18: user.Cards.UpdateCardAmount:input_type -> user.UpdateCardAmountReq
-	1,  // 19: user.User.Register:output_type -> user.RegisterRes
-	3,  // 20: user.User.Login:output_type -> user.LoginRes
-	5,  // 21: user.User.GetUSerByEmail:output_type -> user.GetUserResponse
-	5,  // 22: user.User.GetUserById:output_type -> user.GetUserResponse
-	8,  // 23: user.User.UpdatePassword:output_type -> user.Void
-	8,  // 24: user.User.ResetPassword:output_type -> user.Void
-	8,  // 25: user.User.UpdateUser:output_type -> user.Void
-	8,  // 26: user.User.DeleteUser:output_type -> user.Void
-	8,  // 27: user.User.IsUserExist:output_type -> user.Void
-	14, // 28: user.Notifications.CreateNotification:output_type -> user.CreateNotificationsRes
-	17, // 29: user.Notifications.GetAllNotifications:output_type -> user.GetNotificationsResponse
-	19, // 30: user.Notifications.GetAndMarkNotificationAsRead:output_type -> user.GetAndMarkNotificationAsReadRes
-	21, // 31: user.Cards.CreateCard:output_type -> user.CreateCardRes
-	24, // 32: user.Cards.GetCardsOfUser:output_type -> user.GetCardsOfUserRes
-	26, // 33: user.Cards.GetCardAmount:output_type -> user.GetCardAmountRes
-	28, // 34: user.Cards.UpdateCardAmount:output_type -> user.UpdateCardAmountRes
-	19, // [19:35] is the sub-list for method output_type
-	3,  // [3:19] is the sub-list for method input_type
+	23, // 16: user.Cards.GetCardsOfUser:input_type -> user.GetCardsOfUserReq
+	26, // 17: user.Cards.GetCardAmount:input_type -> user.GetCardAmountReq
+	28, // 18: user.Cards.UpdateCardAmount:input_type -> user.UpdateCardAmountReq
+	22, // 19: user.Cards.DeleteCard:input_type -> user.DeleteCardReq
+	1,  // 20: user.User.Register:output_type -> user.RegisterRes
+	3,  // 21: user.User.Login:output_type -> user.LoginRes
+	5,  // 22: user.User.GetUSerByEmail:output_type -> user.GetUserResponse
+	5,  // 23: user.User.GetUserById:output_type -> user.GetUserResponse
+	8,  // 24: user.User.UpdatePassword:output_type -> user.Void
+	8,  // 25: user.User.ResetPassword:output_type -> user.Void
+	8,  // 26: user.User.UpdateUser:output_type -> user.Void
+	8,  // 27: user.User.DeleteUser:output_type -> user.Void
+	8,  // 28: user.User.IsUserExist:output_type -> user.Void
+	14, // 29: user.Notifications.CreateNotification:output_type -> user.CreateNotificationsRes
+	17, // 30: user.Notifications.GetAllNotifications:output_type -> user.GetNotificationsResponse
+	19, // 31: user.Notifications.GetAndMarkNotificationAsRead:output_type -> user.GetAndMarkNotificationAsReadRes
+	21, // 32: user.Cards.CreateCard:output_type -> user.CreateCardRes
+	25, // 33: user.Cards.GetCardsOfUser:output_type -> user.GetCardsOfUserRes
+	27, // 34: user.Cards.GetCardAmount:output_type -> user.GetCardAmountRes
+	29, // 35: user.Cards.UpdateCardAmount:output_type -> user.UpdateCardAmountRes
+	8,  // 36: user.Cards.DeleteCard:output_type -> user.Void
+	20, // [20:37] is the sub-list for method output_type
+	3,  // [3:20] is the sub-list for method input_type
 	3,  // [3:3] is the sub-list for extension type_name
 	3,  // [3:3] is the sub-list for extension extendee
 	0,  // [0:3] is the sub-list for field type_name
@@ -2212,7 +2278,7 @@ func file_user_proto_init() {
 			}
 		}
 		file_user_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetCardsOfUserReq); i {
+			switch v := v.(*DeleteCardReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2224,7 +2290,7 @@ func file_user_proto_init() {
 			}
 		}
 		file_user_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Card); i {
+			switch v := v.(*GetCardsOfUserReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2236,7 +2302,7 @@ func file_user_proto_init() {
 			}
 		}
 		file_user_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetCardsOfUserRes); i {
+			switch v := v.(*Card); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2248,7 +2314,7 @@ func file_user_proto_init() {
 			}
 		}
 		file_user_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetCardAmountReq); i {
+			switch v := v.(*GetCardsOfUserRes); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2260,7 +2326,7 @@ func file_user_proto_init() {
 			}
 		}
 		file_user_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetCardAmountRes); i {
+			switch v := v.(*GetCardAmountReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2272,7 +2338,7 @@ func file_user_proto_init() {
 			}
 		}
 		file_user_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UpdateCardAmountReq); i {
+			switch v := v.(*GetCardAmountRes); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2284,6 +2350,18 @@ func file_user_proto_init() {
 			}
 		}
 		file_user_proto_msgTypes[28].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateCardAmountReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_user_proto_msgTypes[29].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*UpdateCardAmountRes); i {
 			case 0:
 				return &v.state
@@ -2302,7 +2380,7 @@ func file_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_user_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   29,
+			NumMessages:   30,
 			NumExtensions: 0,
 			NumServices:   3,
 		},

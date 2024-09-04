@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(100) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     full_name VARCHAR(100),
-    phone_number VARCHAR(20),
+    phone_number VARCHAR(20) UNIQUE NOT NULL,
     address VARCHAR(255),
     photo VARCHAR(100),
     role roles NOT NULL DEFAULT 'consumer',
@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS cards (
     expiration_date VARCHAR(5) NOT NULL,
     security_code_hash VARCHAR NOT NULL,
     amount DOUBLE PRECISION NOT NULL DEFAULT 100000,
+    card_type VARCHAR(20) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 

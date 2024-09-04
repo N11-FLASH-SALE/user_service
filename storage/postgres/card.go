@@ -5,6 +5,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -24,13 +25,15 @@ func (r *CardRepository) CreateCard(ctx context.Context, req *pb.CreateCardReq) 
 		return nil, fmt.Errorf("failed to hash security code: %w", err)
 	}
 
+	cardType := GetCardType(req.CardNumber)
+
 	query := `
-        INSERT INTO cards (user_id, card_number, expiration_date, security_code_hash)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO cards (user_id, card_number, expiration_date, security_code_hash, card_type)
+        VALUES ($1, $2, $3, $4, $5)
         RETURNING id
     `
 	var cardID string
-	err = r.Db.QueryRowContext(ctx, query, req.UserId, req.CardNumber, req.ExpirationDate, hashedSecurityCode).Scan(&cardID)
+	err = r.Db.QueryRowContext(ctx, query, req.UserId, req.CardNumber, req.ExpirationDate, hashedSecurityCode, cardType).Scan(&cardID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create card: %w", err)
 	}
@@ -100,4 +103,35 @@ func (r *CardRepository) UpdateCardAmount(ctx context.Context, req *pb.UpdateCar
 	}
 
 	return &pb.UpdateCardAmountRes{Void: ""}, nil
+}
+
+func GetCardType(cardNumber string) string {
+	cardNumber = strings.ReplaceAll(cardNumber, " ", "") // Remove spaces
+
+	if len(cardNumber) < 4 {
+		return "Unknown"
+	}
+
+	firstFourDigits := cardNumber[:4]
+
+	switch {
+	case strings.HasPrefix(firstFourDigits, "9860"):
+		return "HUMO"
+	case strings.HasPrefix(firstFourDigits, "8600"):
+		return "UZCARD"
+	case strings.HasPrefix(firstFourDigits, "4"):
+		return "Visa"
+	case strings.HasPrefix(firstFourDigits, "51"), strings.HasPrefix(firstFourDigits, "52"), strings.HasPrefix(firstFourDigits, "53"), strings.HasPrefix(firstFourDigits, "54"), strings.HasPrefix(firstFourDigits, "55"):
+		return "Mastercard"
+	case strings.HasPrefix(firstFourDigits, "34"), strings.HasPrefix(firstFourDigits, "37"):
+		return "American Express"
+	case strings.HasPrefix(firstFourDigits, "6011"), strings.HasPrefix(firstFourDigits, "622"), strings.HasPrefix(firstFourDigits, "64"), strings.HasPrefix(firstFourDigits, "65"):
+		return "Discover"
+	case strings.HasPrefix(firstFourDigits, "3528"), strings.HasPrefix(firstFourDigits, "3589"):
+		return "JCB"
+	case strings.HasPrefix(firstFourDigits, "62"):
+		return "UnionPay"
+	default:
+		return "Unknown"
+	}
 }

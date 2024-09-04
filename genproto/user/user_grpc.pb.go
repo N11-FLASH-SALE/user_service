@@ -558,6 +558,7 @@ type CardsClient interface {
 	GetCardsOfUser(ctx context.Context, in *GetCardsOfUserReq, opts ...grpc.CallOption) (*GetCardsOfUserRes, error)
 	GetCardAmount(ctx context.Context, in *GetCardAmountReq, opts ...grpc.CallOption) (*GetCardAmountRes, error)
 	UpdateCardAmount(ctx context.Context, in *UpdateCardAmountReq, opts ...grpc.CallOption) (*UpdateCardAmountRes, error)
+	DeleteCard(ctx context.Context, in *DeleteCardReq, opts ...grpc.CallOption) (*Void, error)
 }
 
 type cardsClient struct {
@@ -604,6 +605,15 @@ func (c *cardsClient) UpdateCardAmount(ctx context.Context, in *UpdateCardAmount
 	return out, nil
 }
 
+func (c *cardsClient) DeleteCard(ctx context.Context, in *DeleteCardReq, opts ...grpc.CallOption) (*Void, error) {
+	out := new(Void)
+	err := c.cc.Invoke(ctx, "/user.Cards/DeleteCard", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CardsServer is the server API for Cards service.
 // All implementations must embed UnimplementedCardsServer
 // for forward compatibility
@@ -612,6 +622,7 @@ type CardsServer interface {
 	GetCardsOfUser(context.Context, *GetCardsOfUserReq) (*GetCardsOfUserRes, error)
 	GetCardAmount(context.Context, *GetCardAmountReq) (*GetCardAmountRes, error)
 	UpdateCardAmount(context.Context, *UpdateCardAmountReq) (*UpdateCardAmountRes, error)
+	DeleteCard(context.Context, *DeleteCardReq) (*Void, error)
 	mustEmbedUnimplementedCardsServer()
 }
 
@@ -630,6 +641,9 @@ func (UnimplementedCardsServer) GetCardAmount(context.Context, *GetCardAmountReq
 }
 func (UnimplementedCardsServer) UpdateCardAmount(context.Context, *UpdateCardAmountReq) (*UpdateCardAmountRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateCardAmount not implemented")
+}
+func (UnimplementedCardsServer) DeleteCard(context.Context, *DeleteCardReq) (*Void, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteCard not implemented")
 }
 func (UnimplementedCardsServer) mustEmbedUnimplementedCardsServer() {}
 
@@ -716,6 +730,24 @@ func _Cards_UpdateCardAmount_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Cards_DeleteCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteCardReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CardsServer).DeleteCard(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.Cards/DeleteCard",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CardsServer).DeleteCard(ctx, req.(*DeleteCardReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Cards_ServiceDesc is the grpc.ServiceDesc for Cards service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -738,6 +770,10 @@ var Cards_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateCardAmount",
 			Handler:    _Cards_UpdateCardAmount_Handler,
+		},
+		{
+			MethodName: "DeleteCard",
+			Handler:    _Cards_DeleteCard_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
