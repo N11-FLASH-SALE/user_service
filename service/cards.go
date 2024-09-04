@@ -31,7 +31,7 @@ func (c *CardsService) CreateCard(ctx context.Context, req *pb.CreateCardReq) (*
 		return nil, err
 	}
 	c.Logger.Info("CreateCard rpc method finished")
-	return resp,nil
+	return resp, nil
 }
 func (c *CardsService) GetCardsOfUser(ctx context.Context, req *pb.GetCardsOfUserReq) (*pb.GetCardsOfUserRes, error) {
 	c.Logger.Info("GetCardOfUser rpc is working")
@@ -41,7 +41,7 @@ func (c *CardsService) GetCardsOfUser(ctx context.Context, req *pb.GetCardsOfUse
 		return nil, err
 	}
 	c.Logger.Info("GetCardOfUser rpc method finished")
-	return resp,nil
+	return resp, nil
 }
 func (c *CardsService) GetCardAmount(ctx context.Context, req *pb.GetCardAmountReq) (*pb.GetCardAmountRes, error) {
 	c.Logger.Info("GetCardAmount rpc is working")
@@ -51,7 +51,7 @@ func (c *CardsService) GetCardAmount(ctx context.Context, req *pb.GetCardAmountR
 		return nil, err
 	}
 	c.Logger.Info("GetCardAmount rpc method finished")
-	return resp,nil
+	return resp, nil
 }
 func (c *CardsService) UpdateCardAmount(ctx context.Context, req *pb.UpdateCardAmountReq) (*pb.UpdateCardAmountRes, error) {
 	c.Logger.Info("UpdateCardAmount rpc is working")
@@ -61,5 +61,16 @@ func (c *CardsService) UpdateCardAmount(ctx context.Context, req *pb.UpdateCardA
 		return nil, err
 	}
 	c.Logger.Info("UpdateCardAmount rpc method finished")
-	return resp,nil
+	return resp, nil
+}
+
+func (c *CardsService) DeleteCard(ctx context.Context, req *pb.DeleteCardReq) (*pb.Void, error) {
+	c.Logger.Info("DeleteCard rpc is working")
+	err := c.Cards.Card().DeleteCard(ctx, req)
+	if err != nil {
+		c.Logger.Error(fmt.Sprintf("delete card error: %v", err))
+		return nil, err
+	}
+	c.Logger.Info("DeleteCard rpc method finished")
+	return &pb.Void{}, nil
 }

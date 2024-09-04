@@ -1017,6 +1017,7 @@ type BoughtClient interface {
 	CreateBought(ctx context.Context, in *CreateBoughtRequest, opts ...grpc.CallOption) (*BoughtResponse, error)
 	GetBought(ctx context.Context, in *GetBoughtRequest, opts ...grpc.CallOption) (*GetBoughtResponse, error)
 	GetBoughtOfUser(ctx context.Context, in *GetBoughtOfUserRequest, opts ...grpc.CallOption) (*GetBoughtOfUserResponse, error)
+	GetBoughtByProcessId(ctx context.Context, in *GetBoughtByProcessIdReq, opts ...grpc.CallOption) (*GetBoughtByProcessIdRes, error)
 }
 
 type boughtClient struct {
@@ -1054,6 +1055,15 @@ func (c *boughtClient) GetBoughtOfUser(ctx context.Context, in *GetBoughtOfUserR
 	return out, nil
 }
 
+func (c *boughtClient) GetBoughtByProcessId(ctx context.Context, in *GetBoughtByProcessIdReq, opts ...grpc.CallOption) (*GetBoughtByProcessIdRes, error) {
+	out := new(GetBoughtByProcessIdRes)
+	err := c.cc.Invoke(ctx, "/sale.Bought/GetBoughtByProcessId", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BoughtServer is the server API for Bought service.
 // All implementations must embed UnimplementedBoughtServer
 // for forward compatibility
@@ -1061,6 +1071,7 @@ type BoughtServer interface {
 	CreateBought(context.Context, *CreateBoughtRequest) (*BoughtResponse, error)
 	GetBought(context.Context, *GetBoughtRequest) (*GetBoughtResponse, error)
 	GetBoughtOfUser(context.Context, *GetBoughtOfUserRequest) (*GetBoughtOfUserResponse, error)
+	GetBoughtByProcessId(context.Context, *GetBoughtByProcessIdReq) (*GetBoughtByProcessIdRes, error)
 	mustEmbedUnimplementedBoughtServer()
 }
 
@@ -1076,6 +1087,9 @@ func (UnimplementedBoughtServer) GetBought(context.Context, *GetBoughtRequest) (
 }
 func (UnimplementedBoughtServer) GetBoughtOfUser(context.Context, *GetBoughtOfUserRequest) (*GetBoughtOfUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBoughtOfUser not implemented")
+}
+func (UnimplementedBoughtServer) GetBoughtByProcessId(context.Context, *GetBoughtByProcessIdReq) (*GetBoughtByProcessIdRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBoughtByProcessId not implemented")
 }
 func (UnimplementedBoughtServer) mustEmbedUnimplementedBoughtServer() {}
 
@@ -1144,6 +1158,24 @@ func _Bought_GetBoughtOfUser_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Bought_GetBoughtByProcessId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBoughtByProcessIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BoughtServer).GetBoughtByProcessId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sale.Bought/GetBoughtByProcessId",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BoughtServer).GetBoughtByProcessId(ctx, req.(*GetBoughtByProcessIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Bought_ServiceDesc is the grpc.ServiceDesc for Bought service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1162,6 +1194,10 @@ var Bought_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetBoughtOfUser",
 			Handler:    _Bought_GetBoughtOfUser_Handler,
+		},
+		{
+			MethodName: "GetBoughtByProcessId",
+			Handler:    _Bought_GetBoughtByProcessId_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

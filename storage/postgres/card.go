@@ -43,7 +43,7 @@ func (r *CardRepository) CreateCard(ctx context.Context, req *pb.CreateCardReq) 
 
 func (r *CardRepository) GetCardsOfUser(ctx context.Context, req *pb.GetCardsOfUserReq) (*pb.GetCardsOfUserRes, error) {
 	query := `
-        SELECT id, user_id, card_number, expiration_date
+        SELECT id, user_id, card_number, expiration_date, card_type
         FROM cards
         WHERE user_id = $1
     `
@@ -56,7 +56,7 @@ func (r *CardRepository) GetCardsOfUser(ctx context.Context, req *pb.GetCardsOfU
 	var cards []*pb.Card
 	for rows.Next() {
 		var card pb.Card
-		if err := rows.Scan(&card.Id, &card.UserId, &card.CardNumber, &card.ExpirationDate); err != nil {
+		if err := rows.Scan(&card.Id, &card.UserId, &card.CardNumber, &card.ExpirationDate, &card.CardType); err != nil {
 			return nil, fmt.Errorf("failed to scan card: %w", err)
 		}
 		cards = append(cards, &card)
@@ -103,6 +103,27 @@ func (r *CardRepository) UpdateCardAmount(ctx context.Context, req *pb.UpdateCar
 	}
 
 	return &pb.UpdateCardAmountRes{Void: ""}, nil
+}
+
+func (r *CardRepository) DeleteCard(ctx context.Context, req *pb.DeleteCardReq) error {
+	query := `
+        DELETE FROM cards
+        WHERE card_number = $1
+    `
+	result, err := r.Db.ExecContext(ctx, query, req.CardNumber)
+	if err != nil {
+		return fmt.Errorf("failed to delete card: %w", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to check rows affected: %w", err)
+	}
+	if rowsAffected == 0 {
+		return fmt.Errorf("card not found")
+	}
+
+	return nil
 }
 
 func GetCardType(cardNumber string) string {
